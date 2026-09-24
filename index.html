@@ -5,26 +5,43 @@
 
 <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="
-        width=device-width,
-        initial-scale=1,
-        maximum-scale=1,
-        user-scalable=no,
-        viewport-fit=cover
-    "
->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
 <title>Sliding Door Playable</title>
 
+<link rel="preload" href="assets/bg.png" as="image">
+<link rel="preload" href="assets/girl_1.png" as="image">
+<link rel="preload" href="assets/girl_2.png" as="image">
+<link rel="preload" href="assets/girl_3.png" as="image">
+<link rel="preload" href="assets/girl_4.png" as="image">
+<link rel="preload" href="assets/girl_final.png" as="image">
+<link rel="preload" href="assets/door.png" as="image">
+<link rel="preload" href="assets/door_outline.png" as="image">
+<link rel="preload" href="assets/bulb.png" as="image">
+<link rel="preload" href="assets/hand.png" as="image">
+<link rel="preload" href="assets/final_bg.png" as="image">
+<link rel="preload" href="assets/tutorial_text.png" as="image">
+<link rel="preload" href="assets/text_35.png" as="image">
+<link rel="preload" href="assets/text_50.png" as="image">
+<link rel="preload" href="assets/text_90.png" as="image">
+<link rel="preload" href="assets/final_text.png" as="image">
+<link rel="preload" href="assets/cta_button.png" as="image">
+
 <style>
+
+:root {
+    --bg: #000;
+    --gold: #ffd24d;
+    --gold-soft: rgba(255, 210, 77, 0.5);
+    --white: #fff;
+    --panel: rgba(0, 0, 0, 0.38);
+    --ease: cubic-bezier(.22, .8, .25, 1);
+}
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-
     -webkit-tap-highlight-color: transparent;
     -webkit-user-select: none;
     user-select: none;
@@ -32,567 +49,378 @@
 
 html,
 body {
-
     width: 100%;
     height: 100%;
-
     overflow: hidden;
-
-    background: #000;
-
+    background: var(--bg);
     touch-action: none;
 }
 
 body {
-
     display: flex;
-
     justify-content: center;
     align-items: center;
 }
 
-
 #game {
-
     position: relative;
-
     width: 100vw;
     height: 100vh;
-
-    /*
-        9:16 container.
-    */
-
     max-width: calc(100vh * 9 / 16);
     max-height: calc(100vw * 16 / 9);
-
     aspect-ratio: 9 / 16;
-
     overflow: hidden;
-
-    background: #000;
-
+    background: var(--bg);
     touch-action: none;
-
     isolation: isolate;
+    transform-origin: center center;
 }
 
 #game.final-scene #background {
-
     content: url("assets/final_bg.png");
     filter: none;
     transition: filter .45s ease;
 }
 
+#game.shake {
+    animation: screenShake .45s ease-in-out;
+}
+
+@keyframes screenShake {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    12% { transform: translate3d(-6px, 3px, 0); }
+    28% { transform: translate3d(7px, -4px, 0); }
+    42% { transform: translate3d(-5px, 4px, 0); }
+    58% { transform: translate3d(6px, -2px, 0); }
+    74% { transform: translate3d(-7px, 3px, 0); }
+    88% { transform: translate3d(4px, -3px, 0); }
+}
 
 .layer {
-
     position: absolute;
-
     inset: 0;
-
     width: 100%;
     height: 100%;
-
     object-fit: cover;
-
     pointer-events: none;
-
     user-select: none;
-
     -webkit-user-drag: none;
 }
 
 #background {
-
     z-index: 1;
-
 }
-
 
 #girl {
-
     z-index: 5;
-
     opacity: 1;
-
-    transition:
-
-        opacity .35s ease,
-
-        transform .35s ease;
-
+    transform: scale(1);
+    transition: opacity .28s ease, transform .42s var(--ease);
 }
 
-
 #door {
-
     position: absolute;
-
     z-index: 20;
-
-  
-
     top: 0;
     right: -10%;
     left: auto;
-
     width: 100%;
     height: 100%;
-
     object-fit: contain;
     transform-origin: right center;
-
-   
     transform: translate3d(0, 0, 0);
-
-    transition:
-
-        transform .08s linear;
-
+    transition: transform .08s linear, opacity .25s ease, filter .25s ease;
     pointer-events: none;
-
-    will-change: transform;
-
+    will-change: transform, filter;
     -webkit-user-drag: none;
 }
 
-
 #doorOutline {
-
     position: absolute;
-
     z-index: 19;
-
     top: 0;
     right: -8%;
     left: auto;
-
     width: 100%;
     height: 100%;
-
     object-fit: contain;
     transform-origin: right center;
-
     pointer-events: none;
-
     opacity: 1;
-
     transform: translate3d(0, 0, 0);
-
-    transition:
-
-        transform .08s linear,
-        opacity .2s ease;
-
-    filter:
-
-        drop-shadow(
-            0 0 6px rgba(255,255,255,.8)
-        )
-
-        drop-shadow(
-            0 0 14px rgba(255,210,70,.9)
-        );
-
-    animation:
-
-        doorGlow 1.2s ease-in-out infinite;
+    transition: transform .08s linear, opacity .2s ease, filter .2s ease;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,.8)) drop-shadow(0 0 14px rgba(255,210,70,.9));
+    animation: doorGlow 1.2s ease-in-out infinite;
 }
-
 
 @keyframes doorGlow {
-
     0% {
-
-        filter:
-
-            drop-shadow(
-                0 0 4px rgba(255,255,255,.5)
-            )
-
-            drop-shadow(
-                0 0 8px rgba(255,210,70,.4)
-            );
+        filter: drop-shadow(0 0 4px rgba(255,255,255,.5)) drop-shadow(0 0 8px rgba(255,210,70,.4));
     }
-
     50% {
-
-        filter:
-
-            drop-shadow(
-                0 0 10px rgba(255,255,255,1)
-            )
-
-            drop-shadow(
-                0 0 24px rgba(255,210,70,1)
-            );
+        filter: drop-shadow(0 0 10px rgba(255,255,255,1)) drop-shadow(0 0 24px rgba(255,210,70,1));
     }
-
     100% {
-
-        filter:
-
-            drop-shadow(
-                0 0 4px rgba(255,255,255,.5)
-            )
-
-            drop-shadow(
-                0 0 8px rgba(255,210,70,.4)
-            );
+        filter: drop-shadow(0 0 4px rgba(255,255,255,.5)) drop-shadow(0 0 8px rgba(255,210,70,.4));
     }
 }
 
-
+#tutorialText,
+#gameText,
+#finalText {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    object-fit: contain;
+    pointer-events: none;
+}
 
 #tutorialText {
-
-    position: absolute;
-
     z-index: 50;
-
-    left: 50%;
     top: 64%;
-
     width: 86%;
-
-    transform:
-
-        translateX(-50%);
-
-    object-fit: contain;
-
-    pointer-events: none;
-
     opacity: 1;
-
-    transition:
-
-        opacity .25s ease;
+    transition: opacity .25s ease;
 }
-
 
 #gameText {
-
-    position: absolute;
-
     z-index: 50;
-
-    left: 50%;
     top: 54%;
-
     width: 86%;
-
-    transform:
-
-        translateX(-50%);
-
-    object-fit: contain;
-
-    pointer-events: none;
-
     opacity: 0;
-
-    transition:
-
-        opacity .35s ease;
+    transition: opacity .35s ease;
 }
-
 
 #hand {
-
     position: absolute;
-
     z-index: 60;
-
     left: 62%;
     top: 42%;
-
     width: 23%;
-
     object-fit: contain;
-
     pointer-events: none;
-
     opacity: 1;
-
-    transform:
-
-        translate3d(0,0,0)
-        rotate(-8deg);
-
-    animation:
-
-        handHint 1.35s ease-in-out infinite;
-
-    transition:
-
-        opacity .2s ease;
+    transform: translate3d(0,0,0) rotate(-8deg);
+    animation: handHint 1.35s ease-in-out infinite;
+    transition: opacity .22s ease, left .35s ease, top .35s ease, transform .35s ease;
 }
 
-
 @keyframes handHint {
-
-    0% {
-
-        transform:
-
-            translate3d(0,0,0)
-            rotate(-8deg);
-    }
-
-    50% {
-
-        transform:
-
-            translate3d(-25px,0,0)
-            rotate(-8deg);
-    }
-
-    100% {
-
-        transform:
-
-            translate3d(0,0,0)
-            rotate(-8deg);
-    }
+    0% { transform: translate3d(0,0,0) rotate(-8deg); }
+    50% { transform: translate3d(-25px,0,0) rotate(-8deg); }
+    100% { transform: translate3d(0,0,0) rotate(-8deg); }
 }
 
 #bulb {
-
     position: absolute;
-
     z-index: 80;
-
     left: 7%;
     top: 5%;
-
     width: 16%;
-
     object-fit: contain;
-
     opacity: 0;
-
     transform: scale(.9);
-
     pointer-events: none;
-
-    transition:
-
-        opacity .35s ease,
-
-        transform .35s ease;
+    transition: opacity .35s ease, transform .35s ease, filter .2s ease;
 }
-
 
 #bulb.visible {
-
     opacity: 1;
-
     transform: scale(1);
-
     pointer-events: auto;
 }
-
 
 #bulb.blink {
-
-    animation:
-
-        bulbBlink .65s ease-in-out infinite;
+    animation: bulbBlink .65s ease-in-out infinite;
 }
 
+#bulb.hit {
+    transform: scale(1.12);
+    filter: drop-shadow(0 0 12px rgba(255,255,255,.9)) drop-shadow(0 0 28px rgba(255, 213, 92, .95));
+}
 
 @keyframes bulbBlink {
-
-    0%,
-    100% {
-
+    0%, 100% {
         transform: scale(1);
-
-        filter:
-
-            drop-shadow(
-                0 0 0 transparent
-            );
+        filter: drop-shadow(0 0 0 transparent);
     }
-
     50% {
-
         transform: scale(1.12);
-
-        filter:
-
-            drop-shadow(
-                0 0 10px #fff
-            )
-
-            drop-shadow(
-                0 0 25px #ffd83d
-            )
-
-            drop-shadow(
-                0 0 40px #ffd83d
-            );
+        filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 25px #ffd83d) drop-shadow(0 0 40px #ffd83d);
     }
 }
-
 
 #finalText {
-
-    position: absolute;
-
     z-index: 70;
-
-    left: 50%;
     top: 24%;
-
     width: 86%;
-
-    transform:
-
-        translateX(-50%);
-
-    object-fit: contain;
-
     opacity: 0;
-
-    pointer-events: none;
-
-    transition:
-
-        opacity .4s ease;
+    transition: opacity .4s ease;
 }
-
 
 #cta {
-
     position: absolute;
-
     z-index: 100;
-
     left: 50%;
     bottom: 7%;
-
     width: 65%;
-
-    transform:
-
-        translateX(-50%)
-        scale(.9);
-
+    transform: translateX(-50%) scale(.9);
     opacity: 0;
-
     pointer-events: none;
-
-    transition:
-
-        opacity .35s ease,
-
-        transform .35s ease;
+    transition: opacity .35s ease, transform .35s ease, filter .3s ease;
 }
-
 
 #cta.visible {
-
     opacity: 1;
-
     pointer-events: auto;
-
-    transform:
-
-        translateX(-50%)
-        scale(1);
-
-    animation:
-
-        ctaPulse 1.4s ease-in-out infinite;
+    transform: translateX(-50%) scale(1);
+    animation: ctaPulse 1.4s ease-in-out infinite;
 }
 
+#cta:active {
+    transform: translateX(-50%) scale(.97);
+}
 
 @keyframes ctaPulse {
-
-    0%,
-    100% {
-
-        filter:
-
-            drop-shadow(
-                0 0 0 rgba(255,255,255,0)
-            );
+    0%, 100% {
+        filter: drop-shadow(0 0 0 rgba(255,255,255,0));
     }
-
     50% {
-
-        filter:
-
-            drop-shadow(
-                0 0 14px rgba(255,255,255,.9)
-            );
+        filter: drop-shadow(0 0 14px rgba(255,255,255,.9));
     }
 }
-
 
 #soundButton {
-
     position: absolute;
-
     z-index: 150;
-
     top: 4%;
     right: 4%;
-
     width: 11%;
     aspect-ratio: 1;
-
     border: none;
-
     border-radius: 50%;
-
-    background:
-
-        rgba(0,0,0,.35);
-
+    background: rgba(0,0,0,.35);
     color: #fff;
-
     font-size: 15px;
-
     display: flex;
-
     align-items: center;
     justify-content: center;
-
     cursor: pointer;
-
     opacity: .85;
+    transition: transform .18s ease, opacity .18s ease;
 }
 
+#soundButton:active {
+    transform: scale(.94);
+}
+
+#screenFeedback {
+    position: absolute;
+    z-index: 130;
+    left: 50%;
+    top: 18%;
+    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
+    color: #fff;
+    font-size: clamp(18px, 2vw, 28px);
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(255, 210, 77, .8), 0 0 20px rgba(255,255,255,.2);
+}
+
+#screenFeedback.visible {
+    animation: feedbackPop .8s ease;
+}
+
+@keyframes feedbackPop {
+    0% { opacity: 0; transform: translateX(-50%) scale(.88) translateY(8px); }
+    18% { opacity: 1; }
+    70% { opacity: 1; transform: translateX(-50%) scale(1.02) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) scale(.96) translateY(-8px); }
+}
+
+#vfxLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 140;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.fx-flash,
+.tap-ring,
+.spark {
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
+}
+
+.fx-flash {
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,.28), rgba(255,255,255,0) 62%);
+    opacity: 0;
+    animation: flashBurst .45s ease forwards;
+}
+
+@keyframes flashBurst {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.tap-ring {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255,255,255,.8);
+    box-shadow: 0 0 14px rgba(255, 210, 77, .8);
+    transform: translate(-50%, -50%) scale(.4);
+    animation: tapRing .55s ease forwards;
+}
+
+@keyframes tapRing {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(.4); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(3.4); }
+}
+
+.spark {
+    width: 8px;
+    height: 8px;
+    background: rgba(255,255,255,.9);
+    box-shadow: 0 0 12px rgba(255, 210, 77, .9);
+    transform: translate(-50%, -50%);
+    animation: particleFly .8s ease-out forwards;
+}
+
+@keyframes particleFly {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(.5);
+    }
+    15% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.4);
+    }
+}
 
 #fade {
-
     position: absolute;
-
     z-index: 200;
-
     inset: 0;
-
     background: #000;
-
     opacity: 0;
-
     pointer-events: none;
-
-    transition:
-
-        opacity .35s ease;
+    transition: opacity .35s ease;
 }
-
 
 #fade.active {
-
     opacity: 1;
 }
-
 </style>
 
 </head>
@@ -603,12 +431,13 @@ body {
 
 <div id="game">
 
-
     <img
         id="background"
         class="layer"
         src="assets/bg.png"
         draggable="false"
+        decoding="async"
+        fetchpriority="high"
     >
 
     <img
@@ -616,63 +445,84 @@ body {
         class="layer"
         src="assets/girl_1.png"
         draggable="false"
+        decoding="async"
+        fetchpriority="high"
     >
 
     <img
         id="doorOutline"
         src="assets/door_outline.png"
         draggable="false"
+        decoding="async"
+        fetchpriority="high"
     >
 
     <img
         id="door"
         src="assets/door.png"
         draggable="false"
+        decoding="async"
+        fetchpriority="high"
     >
+
     <img
         id="tutorialText"
         src="assets/tutorial_text.png"
         draggable="false"
+        decoding="async"
+        fetchpriority="high"
     >
 
     <img
         id="gameText"
         src="assets/text_35.png"
         draggable="false"
+        decoding="async"
+        fetchpriority="high"
     >
 
     <img
         id="hand"
         src="assets/hand.png"
         draggable="false"
+        decoding="async"
+        fetchpriority="high"
     >
 
     <img
         id="bulb"
         src="assets/bulb.png"
         draggable="false"
+        decoding="async"
+        fetchpriority="high"
     >
 
     <img
         id="finalText"
         src="assets/final_text.png"
         draggable="false"
+        decoding="async"
+        fetchpriority="high"
     >
 
     <img
         id="cta"
         src="assets/cta_button.png"
         draggable="false"
+        decoding="async"
+        fetchpriority="high"
     >
 
+    <div id="screenFeedback" aria-live="polite"></div>
+    <div id="vfxLayer"></div>
 
     <button
         id="soundButton"
         type="button"
+        aria-label="Toggle sound"
     >
         🔊
     </button>
-
 
     <div id="fade"></div>
 
@@ -719,1059 +569,588 @@ body {
 
 
 <script>
-
-
-const game =
-    document.getElementById("game");
-
-const background =
-    document.getElementById("background");
-
-const girl =
-    document.getElementById("girl");
-
-const door =
-    document.getElementById("door");
-
-const doorOutline =
-    document.getElementById("doorOutline");
-
-const tutorialText =
-    document.getElementById("tutorialText");
-
-const gameText =
-    document.getElementById("gameText");
-
-const hand =
-    document.getElementById("hand");
-
-const bulb =
-    document.getElementById("bulb");
-
-const finalText =
-    document.getElementById("finalText");
-
-const cta =
-    document.getElementById("cta");
-
-const fade =
-    document.getElementById("fade");
-
-const music =
-    document.getElementById("music");
-
-const doorSound =
-    document.getElementById("doorSound");
-
-
-const text35Voice =
-    document.getElementById("text35Voice");
-
-const text50Voice =
-    document.getElementById("text50Voice");
-
-const text90Voice =
-    document.getElementById("text90Voice");
-
-const finalTextVoice =
-    document.getElementById("finalTextVoice");
-
-const soundButton =
-    document.getElementById("soundButton");
+const game = document.getElementById("game");
+const girl = document.getElementById("girl");
+const door = document.getElementById("door");
+const doorOutline = document.getElementById("doorOutline");
+const tutorialText = document.getElementById("tutorialText");
+const gameText = document.getElementById("gameText");
+const hand = document.getElementById("hand");
+const bulb = document.getElementById("bulb");
+const finalText = document.getElementById("finalText");
+const cta = document.getElementById("cta");
+const fade = document.getElementById("fade");
+const music = document.getElementById("music");
+const doorSound = document.getElementById("doorSound");
+const text35Voice = document.getElementById("text35Voice");
+const text50Voice = document.getElementById("text50Voice");
+const text90Voice = document.getElementById("text90Voice");
+const finalTextVoice = document.getElementById("finalTextVoice");
+const soundButton = document.getElementById("soundButton");
+const screenFeedback = document.getElementById("screenFeedback");
+const vfxLayer = document.getElementById("vfxLayer");
 
 let doorProgress = 0;
-
 let dragging = false;
-
 let startX = 0;
-
 let startProgress = 0;
-
 let tutorialStarted = false;
-
 let audioEnabled = true;
-
 let currentScene = 1;
-
 let finalSceneShown = false;
-
 let doorSoundPlayed = false;
-
 let voiceLocked = false;
-
 let currentVoice = null;
-
 let voiceTimeout = null;
-
+let interactionLocked = false;
+let audioContext = null;
+let musicGainNode = null;
+let activeTimers = [];
 
 const SETTINGS = {
-   
     maxDoorProgress: 100,
     dragThreshold: 5,
     releaseBack: 5,
-
     scene35: 20,
-
     scene50: 40,
-
     scene90: 80,
-
     voiceDelay: 180
-
 };
 
+const ASSET_LIST = [
+    "assets/bg.png",
+    "assets/girl_1.png",
+    "assets/girl_2.png",
+    "assets/girl_3.png",
+    "assets/girl_4.png",
+    "assets/girl_final.png",
+    "assets/door.png",
+    "assets/door_outline.png",
+    "assets/bulb.png",
+    "assets/hand.png",
+    "assets/final_bg.png",
+    "assets/tutorial_text.png",
+    "assets/text_35.png",
+    "assets/text_50.png",
+    "assets/text_90.png",
+    "assets/final_text.png",
+    "assets/cta_button.png",
+    "assets/music.mp3",
+    "assets/door_open.mp3",
+    "assets/text_35.mp3",
+    "assets/text_50.mp3",
+    "assets/text_90.mp3",
+    "assets/final_text.mp3"
+];
 
-function init() {
-
-    doorProgress = 0;
-
-    currentScene = 1;
-
-    finalSceneShown = false;
-
-    tutorialStarted = false;
-
-    doorSoundPlayed = false;
-
-    voiceLocked = false;
-
-    currentVoice = null;
-
-    clearTimeout(voiceTimeout);
-
-    voiceTimeout = null;
-
-
-    door.style.transform =
-        "translate3d(0,0,0)";
-
-    doorOutline.style.transform =
-        "translate3d(0,0,0)";
-
-    door.style.opacity =
-        "1";
-
-    doorOutline.style.opacity =
-        "1";
-
-    tutorialText.style.opacity =
-        "1";
-
-    hand.style.opacity =
-        "1";
-
-    gameText.style.opacity =
-        "0";
-
-    bulb.classList.remove(
-        "visible"
-    );
-
-    bulb.classList.remove(
-        "blink"
-    );
-
-    finalText.style.opacity =
-        "0";
-
-    cta.classList.remove(
-        "visible"
-    );
-
-    game.classList.remove(
-        "final-scene"
-    );
-
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
 }
 
-init();
+function scheduleTimer(callback, delay) {
+    const id = setTimeout(callback, delay);
+    activeTimers.push(id);
+    return id;
+}
 
+function clearScheduledTimers() {
+    activeTimers.forEach((id) => clearTimeout(id));
+    activeTimers = [];
+}
 
+function ensureAudioContext() {
+    if (!audioEnabled) return null;
+
+    const AudioCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtor) return null;
+
+    if (!audioContext) {
+        audioContext = new AudioCtor();
+        if (music && !musicGainNode) {
+            musicGainNode = audioContext.createGain();
+            musicGainNode.gain.value = 0.35;
+            const source = audioContext.createMediaElementSource(music);
+            source.connect(musicGainNode);
+            musicGainNode.connect(audioContext.destination);
+        }
+    }
+
+    if (audioContext.state === "suspended") {
+        audioContext.resume().catch(() => {});
+    }
+
+    return audioContext;
+}
+
+function restoreMusicVolume() {
+    if (!musicGainNode) {
+        music.volume = audioEnabled ? 0.35 : 0;
+        return;
+    }
+    musicGainNode.gain.value = audioEnabled ? 0.35 : 0;
+}
+
+function duckMusicForVoice() {
+    if (!musicGainNode) return;
+    musicGainNode.gain.value = audioEnabled ? 0.12 : 0;
+}
 
 function startMusic() {
-
-    if (!audioEnabled)
-        return;
-
-    music.volume = .35;
-
-    music.play()
-        .catch(() => {
-
-
-        });
-
+    if (!audioEnabled) return;
+    ensureAudioContext();
+    restoreMusicVolume();
+    music.muted = false;
+    music.play().catch(() => {});
 }
 
+function playTone({ frequency = 440, duration = 0.12, volume = 0.04, type = "sine", slide = 0 } = {}) {
+    const ctx = ensureAudioContext();
+    if (!ctx || !audioEnabled) return;
 
-function startTutorialInteraction() {
-
-    if (tutorialStarted)
-        return;
-
-    tutorialStarted = true;
-
-    
-
-    tutorialText.style.opacity =
-        "0";
-
-    hand.style.opacity =
-        "0";
-
-
-    startMusic();
-
-}
-
-
-function playDoorSound() {
-
-    if (!audioEnabled)
-        return;
-
-    try {
-
-        doorSound.pause();
-
-    } catch (error) {}
-
-    doorSound.currentTime =
-        0;
-
-    doorSound.volume =
-        .7;
-
-    doorSound.muted = false;
-
-    doorSoundPlayed = true;
-
-    doorSound.play()
-        .catch(() => {});
-
-}
-
-
-function stopDoorSound() {
-
-    if (doorSound) {
-
-        doorSound.pause();
-        doorSound.currentTime = 0;
-
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+    if (slide) {
+        oscillator.frequency.linearRampToValueAtTime(frequency + slide, ctx.currentTime + duration);
     }
 
-    doorSoundPlayed = false;
+    gainNode.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.02);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
 
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + duration + 0.03);
 }
 
+function triggerScreenShake() {
+    game.classList.remove("shake");
+    void game.offsetWidth;
+    game.classList.add("shake");
+    scheduleTimer(() => game.classList.remove("shake"), 500);
+}
 
-function stopVoice() {
+function triggerFlash() {
+    const flash = document.createElement("div");
+    flash.className = "fx-flash";
+    vfxLayer.appendChild(flash);
+    scheduleTimer(() => flash.remove(), 500);
+}
 
+function triggerTapEffect(clientX, clientY) {
+    const rect = game.getBoundingClientRect();
+    const ring = document.createElement("div");
+    ring.className = "tap-ring";
+    ring.style.left = `${clientX - rect.left}px`;
+    ring.style.top = `${clientY - rect.top}px`;
+    vfxLayer.appendChild(ring);
+    scheduleTimer(() => ring.remove(), 550);
+
+    for (let i = 0; i < 8; i += 1) {
+        const spark = document.createElement("div");
+        spark.className = "spark";
+        spark.style.left = `${clientX - rect.left}px`;
+        spark.style.top = `${clientY - rect.top}px`;
+        spark.style.background = "rgba(255,255,255,.9)";
+        spark.style.setProperty("--dx", `${(Math.random() - 0.5) * 100}px`);
+        spark.style.setProperty("--dy", `${(Math.random() - 0.5) * 100}px`);
+        vfxLayer.appendChild(spark);
+        scheduleTimer(() => spark.remove(), 800);
+    }
+}
+
+function showScreenFeedback(label) {
+    if (!screenFeedback) return;
+    screenFeedback.textContent = label;
+    screenFeedback.classList.remove("visible");
+    void screenFeedback.offsetWidth;
+    screenFeedback.classList.add("visible");
+    scheduleTimer(() => screenFeedback.classList.remove("visible"), 900);
+}
+
+function init() {
+    doorProgress = 0;
+    currentScene = 1;
+    finalSceneShown = false;
+    tutorialStarted = false;
+    doorSoundPlayed = false;
+    voiceLocked = false;
+    currentVoice = null;
+    interactionLocked = false;
+    dragging = false;
     clearTimeout(voiceTimeout);
     voiceTimeout = null;
+    clearScheduledTimers();
 
-    if (currentVoice) {
-
-        currentVoice.pause();
-        currentVoice.currentTime = 0;
-
-    }
-
-    currentVoice = null;
-    voiceLocked = false;
-
+    door.style.transform = "translate3d(0,0,0)";
+    doorOutline.style.transform = "translate3d(0,0,0)";
+    door.style.opacity = "1";
+    doorOutline.style.opacity = "1";
+    door.style.display = "block";
+    doorOutline.style.display = "block";
+    hand.style.display = "block";
+    tutorialText.style.opacity = "1";
+    hand.style.opacity = "1";
+    hand.style.left = "62%";
+    hand.style.top = "42%";
+    gameText.style.opacity = "0";
+    bulb.classList.remove("visible", "blink", "hit");
+    finalText.style.opacity = "0";
+    cta.classList.remove("visible");
+    game.classList.remove("final-scene", "shake");
+    screenFeedback.classList.remove("visible");
 }
 
+function startTutorialInteraction() {
+    if (tutorialStarted) return;
+    tutorialStarted = true;
+    tutorialText.style.opacity = "0";
+    hand.style.opacity = "0";
+    startMusic();
+}
 
-function playVoice(audioElement, options = {}) {
+function playDoorSound() {
+    if (!audioEnabled || !doorSound) return;
+    try { doorSound.pause(); } catch (error) {}
+    doorSound.currentTime = 0;
+    doorSound.volume = 0.7;
+    doorSound.muted = false;
+    doorSoundPlayed = true;
+    doorSound.play().catch(() => {});
+    playTone({ frequency: 220, duration: 0.08, volume: 0.025, type: "triangle", slide: 80 });
+}
 
-    const {
-        delayMs = SETTINGS.voiceDelay,
-        hideText = false,
-        onEnded = null
-    } = options;
+function stopDoorSound() {
+    if (doorSound) {
+        doorSound.pause();
+        doorSound.currentTime = 0;
+    }
+    doorSoundPlayed = false;
+}
 
-    if (!audioEnabled || !audioElement)
-        return;
-
-    if (currentVoice && currentVoice !== audioElement) {
-
+function stopVoice() {
+    clearTimeout(voiceTimeout);
+    voiceTimeout = null;
+    if (currentVoice) {
         currentVoice.pause();
         currentVoice.currentTime = 0;
+    }
+    currentVoice = null;
+    voiceLocked = false;
+    restoreMusicVolume();
+}
 
+function updateDoor() {
+    const distance = (doorProgress / 100) * game.clientWidth;
+    const doorOffset = `translate3d(${distance}px, 0, 0)`;
+    door.style.transform = doorOffset;
+    doorOutline.style.transform = doorOffset;
+
+    if (dragging) {
+        doorOutline.style.opacity = "0";
+    }
+}
+
+function setDoorProgress(value) {
+    doorProgress = clamp(value, 0, SETTINGS.maxDoorProgress);
+    updateDoor();
+    checkScenes();
+}
+
+function changeGirl(src) {
+    girl.style.opacity = "0";
+    girl.style.transform = "scale(1.04)";
+
+    scheduleTimer(() => {
+        girl.src = src;
+        girl.style.opacity = "1";
+        girl.style.transform = "scale(1)";
+    }, 180);
+}
+
+function playVoice(audioElement, options = {}) {
+    const { delayMs = SETTINGS.voiceDelay, hideText = false, onEnded = null } = options;
+
+    if (!audioEnabled || !audioElement) return;
+
+    if (currentVoice && currentVoice !== audioElement) {
+        currentVoice.pause();
+        currentVoice.currentTime = 0;
     }
 
     clearTimeout(voiceTimeout);
-
+    duckMusicForVoice();
     voiceLocked = true;
-
     currentVoice = audioElement;
-
     dragging = false;
 
     const startPlayback = function() {
-
         stopDoorSound();
-
         audioElement.currentTime = 0;
         audioElement.volume = 1;
 
         audioElement.onended = function() {
-
             voiceLocked = false;
             currentVoice = null;
-
-            if (hideText) {
-
-                gameText.style.opacity = "0";
-
-            }
-
+            restoreMusicVolume();
+            if (hideText) gameText.style.opacity = "0";
             doorOutline.style.opacity = "1";
             hand.style.opacity = "1";
-
-            if (typeof onEnded === "function") {
-
-                onEnded();
-
-            }
-
+            if (typeof onEnded === "function") onEnded();
         };
 
         try {
-
-            audioElement.play()
-                .catch(() => {
-
-                    voiceLocked = false;
-                    currentVoice = null;
-
-                    if (hideText) {
-
-                        gameText.style.opacity = "0";
-
-                    }
-
-                });
-
+            audioElement.play().catch(() => {
+                voiceLocked = false;
+                currentVoice = null;
+                restoreMusicVolume();
+                if (hideText) gameText.style.opacity = "0";
+            });
         } catch (error) {
-
             voiceLocked = false;
             currentVoice = null;
-
-            if (hideText) {
-
-                gameText.style.opacity = "0";
-
-            }
-
+            restoreMusicVolume();
+            if (hideText) gameText.style.opacity = "0";
         }
-
     };
 
-    clearTimeout(voiceTimeout);
-
-    if (delayMs > 0) {
-
-        voiceTimeout = setTimeout(startPlayback, delayMs);
-
-    } else {
-
-        startPlayback();
-
-    }
-
+    voiceTimeout = setTimeout(startPlayback, delayMs);
 }
-
-
-function updateDoor() {
-
-    
-    const maxDistance =
-        game.clientWidth;
-
-    const distance =
-        (doorProgress / 100) *
-        maxDistance;
-
-   
-        
-    const doorOffset =
-        `translate3d(${distance}px, 0, 0)`;
-
-    door.style.transform =
-        doorOffset;
-
-    doorOutline.style.transform =
-        doorOffset;
-
-
-        
-
-    if (dragging) {
-
-        doorOutline.style.opacity =
-            "0";
-
-    }
-
-}
-
-
-
-
-function setDoorProgress(value) {
-
-    doorProgress = Math.max(
-        0,
-        Math.min(
-            SETTINGS.maxDoorProgress,
-            value
-        )
-    );
-
-    updateDoor();
-
-    checkScenes();
-
-}
-
-
-
-game.addEventListener(
-    "pointerdown",
-    function(event) {
-
-
-        if (
-            event.target === bulb ||
-            event.target === cta ||
-            event.target === soundButton
-        ) {
-
-            return;
-
-        }
-
-        if (voiceLocked)
-            return;
-
-        if (currentVoice && !currentVoice.ended)
-            return;
-
-            
-        startTutorialInteraction();
-
-
-        if (finalSceneShown)
-            return;
-
-        doorSoundPlayed = false;
-
-        dragging = true;
-
-        startX =
-            event.clientX;
-
-        startProgress =
-            doorProgress;
-
-
-        tutorialText.style.opacity =
-            "0";
-
-        hand.style.opacity =
-            "0";
-
-        doorOutline.style.opacity =
-            "0";
-
-
-        startMusic();
-
-        stopDoorSound();
-        playDoorSound();
-
-
-        try {
-
-            game.setPointerCapture(
-                event.pointerId
-            );
-
-        } catch (error) {}
-
-    }
-);
-
-
-game.addEventListener(
-    "pointermove",
-    function(event) {
-
-        if (!dragging || voiceLocked)
-            return;
-
-        if (currentVoice && !currentVoice.ended)
-            return;
-
-        const delta =
-            event.clientX -
-            startX;
-
-
-        if (delta <= 0) {
-
-            if (!voiceLocked && dragging) {
-
-                stopDoorSound();
-
-            }
-
-            return;
-
-        }
-
-
-        if (
-            Math.abs(delta) >
-            SETTINGS.dragThreshold
-        ) {
-
-            tutorialText.style.opacity =
-                "0";
-
-            hand.style.opacity =
-                "0";
-
-            doorOutline.style.opacity =
-                "0";
-
-            if (!doorSoundPlayed) {
-
-                playDoorSound();
-
-            }
-
-        }
-
-
-        const progressChange =
-
-            (
-                delta /
-                game.clientWidth
-            ) * 100;
-
-
-        const newProgress =
-
-            startProgress +
-            progressChange;
-
-
-        setDoorProgress(
-            newProgress
-        );
-
-    }
-);
-
-
-function releaseDoor() {
-
-    if (!dragging)
-        return;
-
-
-    dragging = false;
-
-    stopDoorSound();
-
-
-    const targetProgress =
-
-        Math.max(
-            0,
-            doorProgress -
-            SETTINGS.releaseBack
-        );
-
-
-   
-    door.style.transition =
-
-        "transform .28s cubic-bezier(.25,.8,.25,1)";
-
-
-    setDoorProgress(
-        targetProgress
-    );
-
-    setTimeout(
-        function() {
-
-            door.style.transition =
-                "transform .08s linear";
-
-
-
-            if (
-                !finalSceneShown &&
-                doorProgress <
-                SETTINGS.scene90
-            ) {
-
-                doorOutline.style.opacity =
-                    "1";
-
-                hand.style.opacity =
-                    "1";
-
-            }
-
-        },
-        300
-    );
-
-    if (
-        !finalSceneShown &&
-        doorProgress <
-        SETTINGS.scene90
-    ) {
-
-        doorOutline.style.opacity = "1";
-        hand.style.opacity = "1";
-
-    }
-
-}
-
-
-game.addEventListener(
-    "pointerup",
-    releaseDoor
-);
-
-
-game.addEventListener(
-    "pointercancel",
-    releaseDoor
-);
 
 function checkScenes() {
-
-    if (
-        doorProgress >=
-        SETTINGS.scene35 &&
-        currentScene < 2
-    ) {
-
-        scene35();
-
-    }
-
-
-    if (
-        doorProgress >=
-        SETTINGS.scene50 &&
-        currentScene < 3
-    ) {
-
-        scene50();
-
-    }
-
-
-    if (
-        doorProgress >=
-        SETTINGS.scene90 &&
-        currentScene < 4
-    ) {
-
-        scene90();
-
-    }
-
+    if (doorProgress >= SETTINGS.scene35 && currentScene < 2) scene35();
+    if (doorProgress >= SETTINGS.scene50 && currentScene < 3) scene50();
+    if (doorProgress >= SETTINGS.scene90 && currentScene < 4) scene90();
 }
-
 
 function scene35() {
-
     currentScene = 2;
-
-
-    changeGirl(
-        "assets/girl_2.png"
-    );
-
-
-    gameText.src =
-        "assets/text_35.png";
-
-
-    gameText.style.opacity =
-        "1";
-
-    playVoice(
-        text35Voice,
-        {
-            hideText: true,
-            delayMs: SETTINGS.voiceDelay
-        }
-    );
-
-
-    bulb.classList.add(
-        "visible"
-    );
-
+    changeGirl("assets/girl_2.png");
+    gameText.src = "assets/text_35.png";
+    gameText.style.opacity = "1";
+    playVoice(text35Voice, { hideText: true, delayMs: SETTINGS.voiceDelay });
+    bulb.classList.add("visible");
+    showScreenFeedback("");
+    triggerFlash();
+    playTone({ frequency: 520, duration: 0.16, volume: 0.03, type: "triangle", slide: 90 });
 }
 
-
 function scene50() {
-
     currentScene = 3;
-
-
-    changeGirl(
-        "assets/girl_3.png"
-    );
-
-
-    gameText.src =
-        "assets/text_50.png";
-
-
-    gameText.style.opacity =
-        "1";
-
-    playVoice(
-        text50Voice,
-        {
-            hideText: true,
-            delayMs: SETTINGS.voiceDelay
-        }
-    );
-
+    changeGirl("assets/girl_3.png");
+    gameText.src = "assets/text_50.png";
+    gameText.style.opacity = "1";
+    playVoice(text50Voice, { hideText: true, delayMs: SETTINGS.voiceDelay });
+    showScreenFeedback("");
+    triggerScreenShake();
+    playTone({ frequency: 660, duration: 0.14, volume: 0.04, type: "sawtooth", slide: 120 });
 }
 
 function scene90() {
-
     currentScene = 4;
-
-
-    changeGirl(
-        "assets/girl_4.png"
-    );
-
-
-   
-    door.style.transition =
-        "transform .4s ease, opacity .4s ease";
-
-    doorOutline.style.transition =
-        "transform .4s ease, opacity .4s ease";
-
-    door.style.opacity =
-        "0";
-
-
-    doorOutline.style.opacity =
-        "0";
-
-
-    /*
-        Text.
-    */
-
-    gameText.src =
-        "assets/text_90.png";
-
-    gameText.style.opacity =
-        "1";
-
-    playVoice(
-        text90Voice,
-        {
-            hideText: true,
-            delayMs: SETTINGS.voiceDelay
-        }
-    );
-
-
-    bulb.classList.add(
-        "visible"
-    );
-
-    bulb.classList.add(
-        "blink"
-    );
-
-
-    /*
-        Move hand toward bulb.
-    */
-
-    hand.style.left =
-        "17%";
-
-    hand.style.top =
-        "15%";
-
-    hand.style.opacity =
-        "1";
-
+    changeGirl("assets/girl_4.png");
+    door.style.transition = "transform .4s ease, opacity .4s ease";
+    doorOutline.style.transition = "transform .4s ease, opacity .4s ease";
+    door.style.opacity = "0";
+    doorOutline.style.opacity = "0";
+    door.style.display = "none";
+    doorOutline.style.display = "none";
+    gameText.src = "assets/text_90.png";
+    gameText.style.opacity = "1";
+    playVoice(text90Voice, { hideText: true, delayMs: SETTINGS.voiceDelay });
+    bulb.classList.add("visible", "blink");
+    hand.style.left = "17%";
+    hand.style.top = "15%";
+    hand.style.opacity = "1";
+    showScreenFeedback("");
+    triggerFlash();
+    playTone({ frequency: 780, duration: 0.18, volume: 0.05, type: "square", slide: 150 });
 }
 
+function releaseDoor() {
+    if (!dragging) return;
 
-function changeGirl(src) {
+    dragging = false;
+    stopDoorSound();
 
-    girl.style.opacity =
-        "0";
+    const targetProgress = Math.max(0, doorProgress - SETTINGS.releaseBack);
+    door.style.transition = "transform .28s cubic-bezier(.25,.8,.25,1)";
+    setDoorProgress(targetProgress);
 
-    girl.style.transform =
-        "scale(1.02)";
-
-
-    setTimeout(
-        function() {
-
-            girl.src =
-                src;
-
-            girl.style.opacity =
-                "1";
-
-            girl.style.transform =
-                "scale(1)";
-
-        },
-        220
-    );
-
-}
-
-
-bulb.addEventListener(
-    "pointerdown",
-    function(event) {
-
-        event.stopPropagation();
-
-
-        if (
-            currentScene < 4 ||
-            finalSceneShown ||
-            voiceLocked
-        ) {
-
-            return;
-
+    scheduleTimer(() => {
+        door.style.transition = "transform .08s linear";
+        if (!finalSceneShown && doorProgress < SETTINGS.scene90) {
+            doorOutline.style.opacity = "1";
+            hand.style.opacity = "1";
         }
+    }, 300);
 
-
-        showFinalScene();
-
+    if (!finalSceneShown && doorProgress < SETTINGS.scene90) {
+        doorOutline.style.opacity = "1";
+        hand.style.opacity = "1";
     }
-);
+}
 
 function showFinalScene() {
+    if (finalSceneShown || interactionLocked) return;
 
+    interactionLocked = true;
     finalSceneShown = true;
-
     currentScene = 5;
-
     dragging = false;
 
     hand.style.opacity = "0";
     hand.style.display = "none";
+    game.classList.add("final-scene");
+    fade.classList.add("active");
+    bulb.classList.remove("blink", "visible");
+    triggerFlash();
+    triggerScreenShake();
+    showScreenFeedback("");
+    playTone({ frequency: 960, duration: 0.25, volume: 0.06, type: "triangle", slide: 200 });
+    playVoice(finalTextVoice, { delayMs: SETTINGS.voiceDelay });
 
-    game.classList.add(
-        "final-scene"
-    );
+    scheduleTimer(() => {
+        girl.src = "assets/girl_final.png";
+        girl.style.opacity = "0";
+        gameText.style.opacity = "0";
+        tutorialText.style.opacity = "0";
+        hand.style.opacity = "0";
+        door.style.display = "none";
+        doorOutline.style.display = "none";
+        finalText.style.opacity = "1";
 
+        scheduleTimer(() => {
+            girl.style.opacity = "1";
+            cta.classList.add("visible");
+            interactionLocked = false;
+        }, 150);
 
-
-    fade.classList.add(
-        "active"
-    );
-
-    playVoice(
-        finalTextVoice,
-        {
-            delayMs: SETTINGS.voiceDelay
-        }
-    );
-
-
-    setTimeout(
-        function() {
-
-        
-            girl.src =
-                "assets/girl_final.png";
-
-
-            girl.style.opacity =
-                "0";
-
-            gameText.style.opacity =
-                "0";
-
-            tutorialText.style.opacity =
-                "0";
-
-            hand.style.opacity =
-                "0";
-
-
-            bulb.classList.remove(
-                "blink"
-            );
-
-            bulb.classList.remove(
-                "visible"
-            );
-
-
-            door.style.display =
-                "none";
-
-            doorOutline.style.display =
-                "none";
-
-
-            finalText.style.opacity =
-                "1";
-
-
-            setTimeout(
-                function() {
-
-                    girl.style.opacity =
-                        "1";
-
-                    cta.classList.add(
-                        "visible"
-                    );
-
-                },
-                150
-            );
-
-            setTimeout(
-                function() {
-
-                    fade.classList.remove(
-                        "active"
-                    );
-
-                },
-                250
-            );
-
-        },
-        350
-    );
-
+        scheduleTimer(() => fade.classList.remove("active"), 250);
+    }, 350);
 }
 
-cta.addEventListener(
-    "pointerdown",
-    function(event) {
-
-        event.stopPropagation();
-
-
-        window.open(
-            "https://example.com",
-            "_blank"
-        );
-
-    }
-);
-
-
-soundButton.addEventListener(
-    "pointerdown",
-    function(event) {
-
-        event.stopPropagation();
-
-    }
-);
-
-
-soundButton.addEventListener(
-    "click",
-    function(event) {
-
-        event.stopPropagation();
-
-
-        audioEnabled =
-            !audioEnabled;
-
-
-        if (audioEnabled) {
-
-            soundButton.textContent =
-                "🔊";
-
-            startMusic();
-
-        } else {
-
-            soundButton.textContent =
-                "🔇";
-
-            music.pause();
-
+function preloadAssets() {
+    ASSET_LIST.forEach((src) => {
+        if (src.endsWith(".mp3")) {
+            const audio = new Audio();
+            audio.preload = "auto";
+            audio.src = src;
+            return;
         }
 
+        const img = new Image();
+        img.decoding = "async";
+        img.src = src;
+    });
+}
+
+if (typeof requestIdleCallback === "function") {
+    requestIdleCallback(preloadAssets);
+} else {
+    setTimeout(preloadAssets, 150);
+}
+
+game.addEventListener("pointerdown", function(event) {
+    if (event.target === bulb || event.target === cta || event.target === soundButton) return;
+    if (voiceLocked || interactionLocked) return;
+    if (finalSceneShown) return;
+
+    startTutorialInteraction();
+    doorSoundPlayed = false;
+    dragging = true;
+    startX = event.clientX;
+    startProgress = doorProgress;
+
+    tutorialText.style.opacity = "0";
+    hand.style.opacity = "0";
+    doorOutline.style.opacity = "0";
+    triggerTapEffect(event.clientX, event.clientY);
+    startMusic();
+    stopDoorSound();
+    playDoorSound();
+
+    try { game.setPointerCapture(event.pointerId); } catch (error) {}
+});
+
+game.addEventListener("pointermove", function(event) {
+    if (!dragging || voiceLocked || interactionLocked) return;
+
+    const delta = event.clientX - startX;
+    if (delta <= 0) {
+        if (dragging) stopDoorSound();
+        return;
     }
-);
 
+    if (Math.abs(delta) > SETTINGS.dragThreshold) {
+        tutorialText.style.opacity = "0";
+        hand.style.opacity = "0";
+        doorOutline.style.opacity = "0";
+        if (!doorSoundPlayed) playDoorSound();
+    }
 
-document
-    .querySelectorAll("img")
-    .forEach(
-        function(image) {
+    const progressChange = (delta / game.clientWidth) * 100;
+    setDoorProgress(startProgress + progressChange);
+});
 
-            image.addEventListener(
-                "dragstart",
-                function(event) {
+game.addEventListener("pointerup", releaseDoor);
+game.addEventListener("pointercancel", releaseDoor);
 
-                    event.preventDefault();
+bulb.addEventListener("pointerdown", function(event) {
+    event.stopPropagation();
+    if (currentScene < 4 || finalSceneShown || voiceLocked || interactionLocked) return;
 
-                }
-            );
+    bulb.classList.add("hit");
+    triggerTapEffect(event.clientX, event.clientY);
+    triggerFlash();
+    scheduleTimer(() => bulb.classList.remove("hit"), 220);
+    showFinalScene();
+});
 
-        }
-    );
+cta.addEventListener("pointerdown", function(event) {
+    event.stopPropagation();
+    triggerTapEffect(event.clientX, event.clientY);
+    playTone({ frequency: 880, duration: 0.12, volume: 0.04, type: "triangle", slide: 120 });
+    window.open("https://example.com", "_blank");
+});
 
+soundButton.addEventListener("pointerdown", function(event) {
+    event.stopPropagation();
+    triggerTapEffect(event.clientX, event.clientY);
+});
 
-game.addEventListener(
-    "contextmenu",
-    function(event) {
+soundButton.addEventListener("click", function(event) {
+    event.stopPropagation();
+    audioEnabled = !audioEnabled;
 
+    if (audioEnabled) {
+        soundButton.textContent = "🔊";
+        startMusic();
+    } else {
+        soundButton.textContent = "🔇";
+        music.pause();
+        if (musicGainNode) musicGainNode.gain.value = 0;
+    }
+    restoreMusicVolume();
+});
+
+document.querySelectorAll("img").forEach(function(image) {
+    image.addEventListener("dragstart", function(event) {
         event.preventDefault();
+    });
+});
 
-    }
-);
+game.addEventListener("contextmenu", function(event) {
+    event.preventDefault();
+});
 
+window.addEventListener("resize", function() {
+    updateDoor();
+});
 
-window.addEventListener(
-    "resize",
-    function() {
-
-        updateDoor();
-
-    }
-);
-
+init();
 </script>
 
 </body>
