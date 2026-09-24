@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="
+        width=device-width,
+        initial-scale=1,
+        maximum-scale=1,
+        user-scalable=no,
+        viewport-fit=cover
+    "
+>
+
+<title>Sliding Door Playable</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+html,
+body {
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background: #000;
+
+    touch-action: none;
+}
+
+body {
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+}
+
+
+#game {
+
+    position: relative;
+
+    width: 100vw;
+    height: 100vh;
+
+    /*
+        9:16 container.
+    */
+
+    max-width: calc(100vh * 9 / 16);
+    max-height: calc(100vw * 16 / 9);
+
+    aspect-ratio: 9 / 16;
+
+    overflow: hidden;
+
+    background: #000;
+
+    touch-action: none;
+
+    isolation: isolate;
+}
+
+#game.final-scene #background {
+
+    content: url("assets/final_bg.png");
+    filter: none;
+    transition: filter .45s ease;
+}
+
+
+.layer {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    pointer-events: none;
+
+    user-select: none;
+
+    -webkit-user-drag: none;
+}
+
+#background {
+
+    z-index: 1;
+
+}
+
+
+#girl {
+
+    z-index: 5;
+
+    opacity: 1;
+
+    transition:
+
+        opacity .35s ease,
+
+        transform .35s ease;
+
+}
+
+
+#door {
+
+    position: absolute;
+
+    z-index: 20;
+
+  
+
+    top: 0;
+    right: -10%;
+    left: auto;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    transform-origin: right center;
+
+   
+    transform: translate3d(0, 0, 0);
+
+    transition:
+
+        transform .08s linear;
+
+    pointer-events: none;
+
+    will-change: transform;
+
+    -webkit-user-drag: none;
+}
+
+
+#doorOutline {
+
+    position: absolute;
+
+    z-index: 19;
+
+    top: 0;
+    right: -8%;
+    left: auto;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    transform-origin: right center;
+
+    pointer-events: none;
+
+    opacity: 1;
+
+    transform: translate3d(0, 0, 0);
+
+    transition:
+
+        transform .08s linear,
+        opacity .2s ease;
+
+    filter:
+
+        drop-shadow(
+            0 0 6px rgba(255,255,255,.8)
+        )
+
+        drop-shadow(
+            0 0 14px rgba(255,210,70,.9)
+        );
+
+    animation:
+
+        doorGlow 1.2s ease-in-out infinite;
+}
+
+
+@keyframes doorGlow {
+
+    0% {
+
+        filter:
+
+            drop-shadow(
+                0 0 4px rgba(255,255,255,.5)
+            )
+
+            drop-shadow(
+                0 0 8px rgba(255,210,70,.4)
+            );
+    }
+
+    50% {
+
+        filter:
+
+            drop-shadow(
+                0 0 10px rgba(255,255,255,1)
+            )
+
+            drop-shadow(
+                0 0 24px rgba(255,210,70,1)
+            );
+    }
+
+    100% {
+
+        filter:
+
+            drop-shadow(
+                0 0 4px rgba(255,255,255,.5)
+            )
+
+            drop-shadow(
+                0 0 8px rgba(255,210,70,.4)
+            );
+    }
+}
+
+
+
+#tutorialText {
+
+    position: absolute;
+
+    z-index: 50;
+
+    left: 50%;
+    top: 64%;
+
+    width: 86%;
+
+    transform:
+
+        translateX(-50%);
+
+    object-fit: contain;
+
+    pointer-events: none;
+
+    opacity: 1;
+
+    transition:
+
+        opacity .25s ease;
+}
+
+
+#gameText {
+
+    position: absolute;
+
+    z-index: 50;
+
+    left: 50%;
+    top: 54%;
+
+    width: 86%;
+
+    transform:
+
+        translateX(-50%);
+
+    object-fit: contain;
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transition:
+
+        opacity .35s ease;
+}
+
+
+#hand {
+
+    position: absolute;
+
+    z-index: 60;
+
+    left: 62%;
+    top: 42%;
+
+    width: 23%;
+
+    object-fit: contain;
+
+    pointer-events: none;
+
+    opacity: 1;
+
+    transform:
+
+        translate3d(0,0,0)
+        rotate(-8deg);
+
+    animation:
+
+        handHint 1.35s ease-in-out infinite;
+
+    transition:
+
+        opacity .2s ease;
+}
+
+
+@keyframes handHint {
+
+    0% {
+
+        transform:
+
+            translate3d(0,0,0)
+            rotate(-8deg);
+    }
+
+    50% {
+
+        transform:
+
+            translate3d(-25px,0,0)
+            rotate(-8deg);
+    }
+
+    100% {
+
+        transform:
+
+            translate3d(0,0,0)
+            rotate(-8deg);
+    }
+}
+
+#bulb {
+
+    position: absolute;
+
+    z-index: 80;
+
+    left: 7%;
+    top: 5%;
+
+    width: 16%;
+
+    object-fit: contain;
+
+    opacity: 0;
+
+    transform: scale(.9);
+
+    pointer-events: none;
+
+    transition:
+
+        opacity .35s ease,
+
+        transform .35s ease;
+}
+
+
+#bulb.visible {
+
+    opacity: 1;
+
+    transform: scale(1);
+
+    pointer-events: auto;
+}
+
+
+#bulb.blink {
+
+    animation:
+
+        bulbBlink .65s ease-in-out infinite;
+}
+
+
+@keyframes bulbBlink {
+
+    0%,
+    100% {
+
+        transform: scale(1);
+
+        filter:
+
+            drop-shadow(
+                0 0 0 transparent
+            );
+    }
+
+    50% {
+
+        transform: scale(1.12);
+
+        filter:
+
+            drop-shadow(
+                0 0 10px #fff
+            )
+
+            drop-shadow(
+                0 0 25px #ffd83d
+            )
+
+            drop-shadow(
+                0 0 40px #ffd83d
+            );
+    }
+}
+
+
+#finalText {
+
+    position: absolute;
+
+    z-index: 70;
+
+    left: 50%;
+    top: 24%;
+
+    width: 86%;
+
+    transform:
+
+        translateX(-50%);
+
+    object-fit: contain;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+
+        opacity .4s ease;
+}
+
+
+#cta {
+
+    position: absolute;
+
+    z-index: 100;
+
+    left: 50%;
+    bottom: 7%;
+
+    width: 65%;
+
+    transform:
+
+        translateX(-50%)
+        scale(.9);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+
+        opacity .35s ease,
+
+        transform .35s ease;
+}
+
+
+#cta.visible {
+
+    opacity: 1;
+
+    pointer-events: auto;
+
+    transform:
+
+        translateX(-50%)
+        scale(1);
+
+    animation:
+
+        ctaPulse 1.4s ease-in-out infinite;
+}
+
+
+@keyframes ctaPulse {
+
+    0%,
+    100% {
+
+        filter:
+
+            drop-shadow(
+                0 0 0 rgba(255,255,255,0)
+            );
+    }
+
+    50% {
+
+        filter:
+
+            drop-shadow(
+                0 0 14px rgba(255,255,255,.9)
+            );
+    }
+}
+
+
+#soundButton {
+
+    position: absolute;
+
+    z-index: 150;
+
+    top: 4%;
+    right: 4%;
+
+    width: 11%;
+    aspect-ratio: 1;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background:
+
+        rgba(0,0,0,.35);
+
+    color: #fff;
+
+    font-size: 15px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    opacity: .85;
+}
+
+
+#fade {
+
+    position: absolute;
+
+    z-index: 200;
+
+    inset: 0;
+
+    background: #000;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+
+        opacity .35s ease;
+}
+
+
+#fade.active {
+
+    opacity: 1;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="game">
+
+
+    <img
+        id="background"
+        class="layer"
+        src="assets/bg.png"
+        draggable="false"
+    >
+
+    <img
+        id="girl"
+        class="layer"
+        src="assets/girl_1.png"
+        draggable="false"
+    >
+
+    <img
+        id="doorOutline"
+        src="assets/door_outline.png"
+        draggable="false"
+    >
+
+    <img
+        id="door"
+        src="assets/door.png"
+        draggable="false"
+    >
+    <img
+        id="tutorialText"
+        src="assets/tutorial_text.png"
+        draggable="false"
+    >
+
+    <img
+        id="gameText"
+        src="assets/text_35.png"
+        draggable="false"
+    >
+
+    <img
+        id="hand"
+        src="assets/hand.png"
+        draggable="false"
+    >
+
+    <img
+        id="bulb"
+        src="assets/bulb.png"
+        draggable="false"
+    >
+
+    <img
+        id="finalText"
+        src="assets/final_text.png"
+        draggable="false"
+    >
+
+    <img
+        id="cta"
+        src="assets/cta_button.png"
+        draggable="false"
+    >
+
+
+    <button
+        id="soundButton"
+        type="button"
+    >
+        🔊
+    </button>
+
+
+    <div id="fade"></div>
+
+</div>
+
+
+<audio
+    id="music"
+    src="assets/music.mp3"
+    loop
+    preload="auto">
+</audio>
+
+
+<audio
+    id="doorSound"
+    src="assets/door_open.mp3"
+    preload="auto">
+</audio>
+
+<audio
+    id="text35Voice"
+    src="assets/text_35.mp3"
+    preload="auto">
+</audio>
+
+<audio
+    id="text50Voice"
+    src="assets/text_50.mp3"
+    preload="auto">
+</audio>
+
+<audio
+    id="text90Voice"
+    src="assets/text_90.mp3"
+    preload="auto">
+</audio>
+
+<audio
+    id="finalTextVoice"
+    src="assets/final_text.mp3"
+    preload="auto">
+</audio>
+
+
+<script>
+
+
+const game =
+    document.getElementById("game");
+
+const background =
+    document.getElementById("background");
+
+const girl =
+    document.getElementById("girl");
+
+const door =
+    document.getElementById("door");
+
+const doorOutline =
+    document.getElementById("doorOutline");
+
+const tutorialText =
+    document.getElementById("tutorialText");
+
+const gameText =
+    document.getElementById("gameText");
+
+const hand =
+    document.getElementById("hand");
+
+const bulb =
+    document.getElementById("bulb");
+
+const finalText =
+    document.getElementById("finalText");
+
+const cta =
+    document.getElementById("cta");
+
+const fade =
+    document.getElementById("fade");
+
+const music =
+    document.getElementById("music");
+
+const doorSound =
+    document.getElementById("doorSound");
+
+
+const text35Voice =
+    document.getElementById("text35Voice");
+
+const text50Voice =
+    document.getElementById("text50Voice");
+
+const text90Voice =
+    document.getElementById("text90Voice");
+
+const finalTextVoice =
+    document.getElementById("finalTextVoice");
+
+const soundButton =
+    document.getElementById("soundButton");
+
+let doorProgress = 0;
+
+let dragging = false;
+
+let startX = 0;
+
+let startProgress = 0;
+
+let tutorialStarted = false;
+
+let audioEnabled = true;
+
+let currentScene = 1;
+
+let finalSceneShown = false;
+
+let doorSoundPlayed = false;
+
+let voiceLocked = false;
+
+let currentVoice = null;
+
+let voiceTimeout = null;
+
+
+const SETTINGS = {
+   
+    maxDoorProgress: 100,
+    dragThreshold: 5,
+    releaseBack: 5,
+
+    scene35: 20,
+
+    scene50: 40,
+
+    scene90: 80,
+
+    voiceDelay: 180
+
+};
+
+
+function init() {
+
+    doorProgress = 0;
+
+    currentScene = 1;
+
+    finalSceneShown = false;
+
+    tutorialStarted = false;
+
+    doorSoundPlayed = false;
+
+    voiceLocked = false;
+
+    currentVoice = null;
+
+    clearTimeout(voiceTimeout);
+
+    voiceTimeout = null;
+
+
+    door.style.transform =
+        "translate3d(0,0,0)";
+
+    doorOutline.style.transform =
+        "translate3d(0,0,0)";
+
+    door.style.opacity =
+        "1";
+
+    doorOutline.style.opacity =
+        "1";
+
+    tutorialText.style.opacity =
+        "1";
+
+    hand.style.opacity =
+        "1";
+
+    gameText.style.opacity =
+        "0";
+
+    bulb.classList.remove(
+        "visible"
+    );
+
+    bulb.classList.remove(
+        "blink"
+    );
+
+    finalText.style.opacity =
+        "0";
+
+    cta.classList.remove(
+        "visible"
+    );
+
+    game.classList.remove(
+        "final-scene"
+    );
+
+}
+
+init();
+
+
+
+function startMusic() {
+
+    if (!audioEnabled)
+        return;
+
+    music.volume = .35;
+
+    music.play()
+        .catch(() => {
+
+
+        });
+
+}
+
+
+function startTutorialInteraction() {
+
+    if (tutorialStarted)
+        return;
+
+    tutorialStarted = true;
+
+    
+
+    tutorialText.style.opacity =
+        "0";
+
+    hand.style.opacity =
+        "0";
+
+
+    startMusic();
+
+}
+
+
+function playDoorSound() {
+
+    if (!audioEnabled)
+        return;
+
+    try {
+
+        doorSound.pause();
+
+    } catch (error) {}
+
+    doorSound.currentTime =
+        0;
+
+    doorSound.volume =
+        .7;
+
+    doorSound.muted = false;
+
+    doorSoundPlayed = true;
+
+    doorSound.play()
+        .catch(() => {});
+
+}
+
+
+function stopDoorSound() {
+
+    if (doorSound) {
+
+        doorSound.pause();
+        doorSound.currentTime = 0;
+
+    }
+
+    doorSoundPlayed = false;
+
+}
+
+
+function stopVoice() {
+
+    clearTimeout(voiceTimeout);
+    voiceTimeout = null;
+
+    if (currentVoice) {
+
+        currentVoice.pause();
+        currentVoice.currentTime = 0;
+
+    }
+
+    currentVoice = null;
+    voiceLocked = false;
+
+}
+
+
+function playVoice(audioElement, options = {}) {
+
+    const {
+        delayMs = SETTINGS.voiceDelay,
+        hideText = false,
+        onEnded = null
+    } = options;
+
+    if (!audioEnabled || !audioElement)
+        return;
+
+    if (currentVoice && currentVoice !== audioElement) {
+
+        currentVoice.pause();
+        currentVoice.currentTime = 0;
+
+    }
+
+    clearTimeout(voiceTimeout);
+
+    voiceLocked = true;
+
+    currentVoice = audioElement;
+
+    dragging = false;
+
+    const startPlayback = function() {
+
+        stopDoorSound();
+
+        audioElement.currentTime = 0;
+        audioElement.volume = 1;
+
+        audioElement.onended = function() {
+
+            voiceLocked = false;
+            currentVoice = null;
+
+            if (hideText) {
+
+                gameText.style.opacity = "0";
+
+            }
+
+            doorOutline.style.opacity = "1";
+            hand.style.opacity = "1";
+
+            if (typeof onEnded === "function") {
+
+                onEnded();
+
+            }
+
+        };
+
+        try {
+
+            audioElement.play()
+                .catch(() => {
+
+                    voiceLocked = false;
+                    currentVoice = null;
+
+                    if (hideText) {
+
+                        gameText.style.opacity = "0";
+
+                    }
+
+                });
+
+        } catch (error) {
+
+            voiceLocked = false;
+            currentVoice = null;
+
+            if (hideText) {
+
+                gameText.style.opacity = "0";
+
+            }
+
+        }
+
+    };
+
+    clearTimeout(voiceTimeout);
+
+    if (delayMs > 0) {
+
+        voiceTimeout = setTimeout(startPlayback, delayMs);
+
+    } else {
+
+        startPlayback();
+
+    }
+
+}
+
+
+function updateDoor() {
+
+    
+    const maxDistance =
+        game.clientWidth;
+
+    const distance =
+        (doorProgress / 100) *
+        maxDistance;
+
+   
+        
+    const doorOffset =
+        `translate3d(${distance}px, 0, 0)`;
+
+    door.style.transform =
+        doorOffset;
+
+    doorOutline.style.transform =
+        doorOffset;
+
+
+        
+
+    if (dragging) {
+
+        doorOutline.style.opacity =
+            "0";
+
+    }
+
+}
+
+
+
+
+function setDoorProgress(value) {
+
+    doorProgress = Math.max(
+        0,
+        Math.min(
+            SETTINGS.maxDoorProgress,
+            value
+        )
+    );
+
+    updateDoor();
+
+    checkScenes();
+
+}
+
+
+
+game.addEventListener(
+    "pointerdown",
+    function(event) {
+
+
+        if (
+            event.target === bulb ||
+            event.target === cta ||
+            event.target === soundButton
+        ) {
+
+            return;
+
+        }
+
+        if (voiceLocked)
+            return;
+
+        if (currentVoice && !currentVoice.ended)
+            return;
+
+            
+        startTutorialInteraction();
+
+
+        if (finalSceneShown)
+            return;
+
+        doorSoundPlayed = false;
+
+        dragging = true;
+
+        startX =
+            event.clientX;
+
+        startProgress =
+            doorProgress;
+
+
+        tutorialText.style.opacity =
+            "0";
+
+        hand.style.opacity =
+            "0";
+
+        doorOutline.style.opacity =
+            "0";
+
+
+        startMusic();
+
+        stopDoorSound();
+        playDoorSound();
+
+
+        try {
+
+            game.setPointerCapture(
+                event.pointerId
+            );
+
+        } catch (error) {}
+
+    }
+);
+
+
+game.addEventListener(
+    "pointermove",
+    function(event) {
+
+        if (!dragging || voiceLocked)
+            return;
+
+        if (currentVoice && !currentVoice.ended)
+            return;
+
+        const delta =
+            event.clientX -
+            startX;
+
+
+        if (delta <= 0) {
+
+            if (!voiceLocked && dragging) {
+
+                stopDoorSound();
+
+            }
+
+            return;
+
+        }
+
+
+        if (
+            Math.abs(delta) >
+            SETTINGS.dragThreshold
+        ) {
+
+            tutorialText.style.opacity =
+                "0";
+
+            hand.style.opacity =
+                "0";
+
+            doorOutline.style.opacity =
+                "0";
+
+            if (!doorSoundPlayed) {
+
+                playDoorSound();
+
+            }
+
+        }
+
+
+        const progressChange =
+
+            (
+                delta /
+                game.clientWidth
+            ) * 100;
+
+
+        const newProgress =
+
+            startProgress +
+            progressChange;
+
+
+        setDoorProgress(
+            newProgress
+        );
+
+    }
+);
+
+
+function releaseDoor() {
+
+    if (!dragging)
+        return;
+
+
+    dragging = false;
+
+    stopDoorSound();
+
+
+    const targetProgress =
+
+        Math.max(
+            0,
+            doorProgress -
+            SETTINGS.releaseBack
+        );
+
+
+   
+    door.style.transition =
+
+        "transform .28s cubic-bezier(.25,.8,.25,1)";
+
+
+    setDoorProgress(
+        targetProgress
+    );
+
+    setTimeout(
+        function() {
+
+            door.style.transition =
+                "transform .08s linear";
+
+
+
+            if (
+                !finalSceneShown &&
+                doorProgress <
+                SETTINGS.scene90
+            ) {
+
+                doorOutline.style.opacity =
+                    "1";
+
+                hand.style.opacity =
+                    "1";
+
+            }
+
+        },
+        300
+    );
+
+    if (
+        !finalSceneShown &&
+        doorProgress <
+        SETTINGS.scene90
+    ) {
+
+        doorOutline.style.opacity = "1";
+        hand.style.opacity = "1";
+
+    }
+
+}
+
+
+game.addEventListener(
+    "pointerup",
+    releaseDoor
+);
+
+
+game.addEventListener(
+    "pointercancel",
+    releaseDoor
+);
+
+function checkScenes() {
+
+    if (
+        doorProgress >=
+        SETTINGS.scene35 &&
+        currentScene < 2
+    ) {
+
+        scene35();
+
+    }
+
+
+    if (
+        doorProgress >=
+        SETTINGS.scene50 &&
+        currentScene < 3
+    ) {
+
+        scene50();
+
+    }
+
+
+    if (
+        doorProgress >=
+        SETTINGS.scene90 &&
+        currentScene < 4
+    ) {
+
+        scene90();
+
+    }
+
+}
+
+
+function scene35() {
+
+    currentScene = 2;
+
+
+    changeGirl(
+        "assets/girl_2.png"
+    );
+
+
+    gameText.src =
+        "assets/text_35.png";
+
+
+    gameText.style.opacity =
+        "1";
+
+    playVoice(
+        text35Voice,
+        {
+            hideText: true,
+            delayMs: SETTINGS.voiceDelay
+        }
+    );
+
+
+    bulb.classList.add(
+        "visible"
+    );
+
+}
+
+
+function scene50() {
+
+    currentScene = 3;
+
+
+    changeGirl(
+        "assets/girl_3.png"
+    );
+
+
+    gameText.src =
+        "assets/text_50.png";
+
+
+    gameText.style.opacity =
+        "1";
+
+    playVoice(
+        text50Voice,
+        {
+            hideText: true,
+            delayMs: SETTINGS.voiceDelay
+        }
+    );
+
+}
+
+function scene90() {
+
+    currentScene = 4;
+
+
+    changeGirl(
+        "assets/girl_4.png"
+    );
+
+
+   
+    door.style.transition =
+        "transform .4s ease, opacity .4s ease";
+
+    doorOutline.style.transition =
+        "transform .4s ease, opacity .4s ease";
+
+    door.style.opacity =
+        "0";
+
+
+    doorOutline.style.opacity =
+        "0";
+
+
+    /*
+        Text.
+    */
+
+    gameText.src =
+        "assets/text_90.png";
+
+    gameText.style.opacity =
+        "1";
+
+    playVoice(
+        text90Voice,
+        {
+            hideText: true,
+            delayMs: SETTINGS.voiceDelay
+        }
+    );
+
+
+    bulb.classList.add(
+        "visible"
+    );
+
+    bulb.classList.add(
+        "blink"
+    );
+
+
+    /*
+        Move hand toward bulb.
+    */
+
+    hand.style.left =
+        "17%";
+
+    hand.style.top =
+        "15%";
+
+    hand.style.opacity =
+        "1";
+
+}
+
+
+function changeGirl(src) {
+
+    girl.style.opacity =
+        "0";
+
+    girl.style.transform =
+        "scale(1.02)";
+
+
+    setTimeout(
+        function() {
+
+            girl.src =
+                src;
+
+            girl.style.opacity =
+                "1";
+
+            girl.style.transform =
+                "scale(1)";
+
+        },
+        220
+    );
+
+}
+
+
+bulb.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        event.stopPropagation();
+
+
+        if (
+            currentScene < 4 ||
+            finalSceneShown ||
+            voiceLocked
+        ) {
+
+            return;
+
+        }
+
+
+        showFinalScene();
+
+    }
+);
+
+function showFinalScene() {
+
+    finalSceneShown = true;
+
+    currentScene = 5;
+
+    dragging = false;
+
+    hand.style.opacity = "0";
+    hand.style.display = "none";
+
+    game.classList.add(
+        "final-scene"
+    );
+
+
+
+    fade.classList.add(
+        "active"
+    );
+
+    playVoice(
+        finalTextVoice,
+        {
+            delayMs: SETTINGS.voiceDelay
+        }
+    );
+
+
+    setTimeout(
+        function() {
+
+        
+            girl.src =
+                "assets/girl_final.png";
+
+
+            girl.style.opacity =
+                "0";
+
+            gameText.style.opacity =
+                "0";
+
+            tutorialText.style.opacity =
+                "0";
+
+            hand.style.opacity =
+                "0";
+
+
+            bulb.classList.remove(
+                "blink"
+            );
+
+            bulb.classList.remove(
+                "visible"
+            );
+
+
+            door.style.display =
+                "none";
+
+            doorOutline.style.display =
+                "none";
+
+
+            finalText.style.opacity =
+                "1";
+
+
+            setTimeout(
+                function() {
+
+                    girl.style.opacity =
+                        "1";
+
+                    cta.classList.add(
+                        "visible"
+                    );
+
+                },
+                150
+            );
+
+            setTimeout(
+                function() {
+
+                    fade.classList.remove(
+                        "active"
+                    );
+
+                },
+                250
+            );
+
+        },
+        350
+    );
+
+}
+
+cta.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        event.stopPropagation();
+
+
+        window.open(
+            "https://example.com",
+            "_blank"
+        );
+
+    }
+);
+
+
+soundButton.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        event.stopPropagation();
+
+    }
+);
+
+
+soundButton.addEventListener(
+    "click",
+    function(event) {
+
+        event.stopPropagation();
+
+
+        audioEnabled =
+            !audioEnabled;
+
+
+        if (audioEnabled) {
+
+            soundButton.textContent =
+                "🔊";
+
+            startMusic();
+
+        } else {
+
+            soundButton.textContent =
+                "🔇";
+
+            music.pause();
+
+        }
+
+    }
+);
+
+
+document
+    .querySelectorAll("img")
+    .forEach(
+        function(image) {
+
+            image.addEventListener(
+                "dragstart",
+                function(event) {
+
+                    event.preventDefault();
+
+                }
+            );
+
+        }
+    );
+
+
+game.addEventListener(
+    "contextmenu",
+    function(event) {
+
+        event.preventDefault();
+
+    }
+);
+
+
+window.addEventListener(
+    "resize",
+    function() {
+
+        updateDoor();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
