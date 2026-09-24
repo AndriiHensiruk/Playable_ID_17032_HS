@@ -1,1157 +1,388 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-
 <title>Sliding Door Playable</title>
-
 <link rel="preload" href="assets/bg.png" as="image">
 <link rel="preload" href="assets/girl_1.png" as="image">
-<link rel="preload" href="assets/girl_2.png" as="image">
-<link rel="preload" href="assets/girl_3.png" as="image">
-<link rel="preload" href="assets/girl_4.png" as="image">
-<link rel="preload" href="assets/girl_final.png" as="image">
 <link rel="preload" href="assets/door.png" as="image">
 <link rel="preload" href="assets/door_outline.png" as="image">
-<link rel="preload" href="assets/bulb.png" as="image">
-<link rel="preload" href="assets/hand.png" as="image">
-<link rel="preload" href="assets/final_bg.png" as="image">
-<link rel="preload" href="assets/tutorial_text.png" as="image">
-<link rel="preload" href="assets/text_35.png" as="image">
-<link rel="preload" href="assets/text_50.png" as="image">
-<link rel="preload" href="assets/text_90.png" as="image">
-<link rel="preload" href="assets/final_text.png" as="image">
-<link rel="preload" href="assets/cta_button.png" as="image">
-
 <style>
-
-:root {
-    --bg: #000;
-    --gold: #ffd24d;
-    --gold-soft: rgba(255, 210, 77, 0.5);
-    --white: #fff;
-    --panel: rgba(0, 0, 0, 0.38);
-    --ease: cubic-bezier(.22, .8, .25, 1);
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-html,
-body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: var(--bg);
-    touch-action: none;
-}
-
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#game {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    max-width: calc(100vh * 9 / 16);
-    max-height: calc(100vw * 16 / 9);
-    aspect-ratio: 9 / 16;
-    overflow: hidden;
-    background: var(--bg);
-    touch-action: none;
-    isolation: isolate;
-    transform-origin: center center;
-}
-
-#game.final-scene #background {
-    content: url("assets/final_bg.png");
-    filter: none;
-    transition: filter .45s ease;
-}
-
-#game.shake {
-    animation: screenShake .45s ease-in-out;
-}
-
-@keyframes screenShake {
-    0%, 100% { transform: translate3d(0, 0, 0); }
-    12% { transform: translate3d(-6px, 3px, 0); }
-    28% { transform: translate3d(7px, -4px, 0); }
-    42% { transform: translate3d(-5px, 4px, 0); }
-    58% { transform: translate3d(6px, -2px, 0); }
-    74% { transform: translate3d(-7px, 3px, 0); }
-    88% { transform: translate3d(4px, -3px, 0); }
-}
-
-.layer {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-drag: none;
-}
-
-#background {
-    z-index: 1;
-}
-
-#girl {
-    z-index: 5;
-    opacity: 1;
-    transform: scale(1);
-    transition: opacity .28s ease, transform .42s var(--ease);
-}
-
-#door {
-    position: absolute;
-    z-index: 20;
-    top: 0;
-    right: -10%;
-    left: auto;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transform-origin: right center;
-    transform: translate3d(0, 0, 0);
-    transition: transform .08s linear, opacity .25s ease, filter .25s ease;
-    pointer-events: none;
-    will-change: transform, filter;
-    -webkit-user-drag: none;
-}
-
-#doorOutline {
-    position: absolute;
-    z-index: 19;
-    top: 0;
-    right: -8%;
-    left: auto;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transform-origin: right center;
-    pointer-events: none;
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-    transition: transform .08s linear, opacity .2s ease, filter .2s ease;
-    filter: drop-shadow(0 0 6px rgba(255,255,255,.8)) drop-shadow(0 0 14px rgba(255,210,70,.9));
-    animation: doorGlow 1.2s ease-in-out infinite;
-}
-
-@keyframes doorGlow {
-    0% {
-        filter: drop-shadow(0 0 4px rgba(255,255,255,.5)) drop-shadow(0 0 8px rgba(255,210,70,.4));
-    }
-    50% {
-        filter: drop-shadow(0 0 10px rgba(255,255,255,1)) drop-shadow(0 0 24px rgba(255,210,70,1));
-    }
-    100% {
-        filter: drop-shadow(0 0 4px rgba(255,255,255,.5)) drop-shadow(0 0 8px rgba(255,210,70,.4));
-    }
-}
-
-#tutorialText,
-#gameText,
-#finalText {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    object-fit: contain;
-    pointer-events: none;
-}
-
-#tutorialText {
-    z-index: 50;
-    top: 64%;
-    width: 86%;
-    opacity: 1;
-    transition: opacity .25s ease;
-}
-
-#gameText {
-    z-index: 50;
-    top: 54%;
-    width: 86%;
-    opacity: 0;
-    transition: opacity .35s ease;
-}
-
-#hand {
-    position: absolute;
-    z-index: 60;
-    left: 62%;
-    top: 42%;
-    width: 23%;
-    object-fit: contain;
-    pointer-events: none;
-    opacity: 1;
-    transform: translate3d(0,0,0) rotate(-8deg);
-    animation: handHint 1.35s ease-in-out infinite;
-    transition: opacity .22s ease, left .35s ease, top .35s ease, transform .35s ease;
-}
-
-@keyframes handHint {
-    0% { transform: translate3d(0,0,0) rotate(-8deg); }
-    50% { transform: translate3d(-25px,0,0) rotate(-8deg); }
-    100% { transform: translate3d(0,0,0) rotate(-8deg); }
-}
-
-#bulb {
-    position: absolute;
-    z-index: 80;
-    left: 7%;
-    top: 5%;
-    width: 16%;
-    object-fit: contain;
-    opacity: 0;
-    transform: scale(.9);
-    pointer-events: none;
-    transition: opacity .35s ease, transform .35s ease, filter .2s ease;
-}
-
-#bulb.visible {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
-}
-
-#bulb.blink {
-    animation: bulbBlink .65s ease-in-out infinite;
-}
-
-#bulb.hit {
-    transform: scale(1.12);
-    filter: drop-shadow(0 0 12px rgba(255,255,255,.9)) drop-shadow(0 0 28px rgba(255, 213, 92, .95));
-}
-
-@keyframes bulbBlink {
-    0%, 100% {
-        transform: scale(1);
-        filter: drop-shadow(0 0 0 transparent);
-    }
-    50% {
-        transform: scale(1.12);
-        filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 25px #ffd83d) drop-shadow(0 0 40px #ffd83d);
-    }
-}
-
-#finalText {
-    z-index: 70;
-    top: 24%;
-    width: 86%;
-    opacity: 0;
-    transition: opacity .4s ease;
-}
-
-#cta {
-    position: absolute;
-    z-index: 100;
-    left: 50%;
-    bottom: 7%;
-    width: 65%;
-    transform: translateX(-50%) scale(.9);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .35s ease, transform .35s ease, filter .3s ease;
-}
-
-#cta.visible {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateX(-50%) scale(1);
-    animation: ctaPulse 1.4s ease-in-out infinite;
-}
-
-#cta:active {
-    transform: translateX(-50%) scale(.97);
-}
-
-@keyframes ctaPulse {
-    0%, 100% {
-        filter: drop-shadow(0 0 0 rgba(255,255,255,0));
-    }
-    50% {
-        filter: drop-shadow(0 0 14px rgba(255,255,255,.9));
-    }
-}
-
-#soundButton {
-    position: absolute;
-    z-index: 150;
-    top: 4%;
-    right: 4%;
-    width: 11%;
-    aspect-ratio: 1;
-    border: none;
-    border-radius: 50%;
-    background: rgba(0,0,0,.35);
-    color: #fff;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: .85;
-    transition: transform .18s ease, opacity .18s ease;
-}
-
-#soundButton:active {
-    transform: scale(.94);
-}
-
-#screenFeedback {
-    position: absolute;
-    z-index: 130;
-    left: 50%;
-    top: 18%;
-    transform: translateX(-50%);
-    opacity: 0;
-    pointer-events: none;
-    color: #fff;
-    font-size: clamp(18px, 2vw, 28px);
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    text-shadow: 0 0 12px rgba(255, 210, 77, .8), 0 0 20px rgba(255,255,255,.2);
-}
-
-#screenFeedback.visible {
-    animation: feedbackPop .8s ease;
-}
-
-@keyframes feedbackPop {
-    0% { opacity: 0; transform: translateX(-50%) scale(.88) translateY(8px); }
-    18% { opacity: 1; }
-    70% { opacity: 1; transform: translateX(-50%) scale(1.02) translateY(0); }
-    100% { opacity: 0; transform: translateX(-50%) scale(.96) translateY(-8px); }
-}
-
-#vfxLayer {
-    position: absolute;
-    inset: 0;
-    z-index: 140;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-.fx-flash,
-.tap-ring,
-.spark {
-    position: absolute;
-    border-radius: 999px;
-    pointer-events: none;
-}
-
-.fx-flash {
-    inset: 0;
-    background: radial-gradient(circle at center, rgba(255,255,255,.28), rgba(255,255,255,0) 62%);
-    opacity: 0;
-    animation: flashBurst .45s ease forwards;
-}
-
-@keyframes flashBurst {
-    0% { opacity: 0; }
-    30% { opacity: 1; }
-    100% { opacity: 0; }
-}
-
-.tap-ring {
-    width: 24px;
-    height: 24px;
-    border: 2px solid rgba(255,255,255,.8);
-    box-shadow: 0 0 14px rgba(255, 210, 77, .8);
-    transform: translate(-50%, -50%) scale(.4);
-    animation: tapRing .55s ease forwards;
-}
-
-@keyframes tapRing {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(.4); }
-    20% { opacity: 1; }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(3.4); }
-}
-
-.spark {
-    width: 8px;
-    height: 8px;
-    background: rgba(255,255,255,.9);
-    box-shadow: 0 0 12px rgba(255, 210, 77, .9);
-    transform: translate(-50%, -50%);
-    animation: particleFly .8s ease-out forwards;
-}
-
-@keyframes particleFly {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(.5);
-    }
-    15% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.4);
-    }
-}
-
-#fade {
-    position: absolute;
-    z-index: 200;
-    inset: 0;
-    background: #000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .35s ease;
-}
-
-#fade.active {
-    opacity: 1;
-}
+:root{--bg:#000;--ease:cubic-bezier(.22,.8,.25,1)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);touch-action:none;overscroll-behavior:none}
+body{display:flex;justify-content:center;align-items:center}
+#game{position:relative;width:100vw;height:100vh;height:100dvh;max-width:calc(100vh*9/16);max-width:calc(100dvh*9/16);max-height:calc(100vw*16/9);aspect-ratio:9/16;overflow:hidden;background:var(--bg);touch-action:none;isolation:isolate;opacity:0;transition:opacity .3s}
+#game.ready{opacity:1}
+#game.shake{animation:screenShake .45s ease-in-out}
+@keyframes screenShake{0%,100%{transform:translate3d(0,0,0)}12%{transform:translate3d(-6px,3px,0)}28%{transform:translate3d(7px,-4px,0)}42%{transform:translate3d(-5px,4px,0)}58%{transform:translate3d(6px,-2px,0)}74%{transform:translate3d(-7px,3px,0)}88%{transform:translate3d(4px,-3px,0)}}
+.layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+#background{z-index:1}
+#girl{z-index:5;transition:opacity .28s ease,transform .42s var(--ease)}
+#door,#doorOutline{position:absolute;top:0;left:auto;width:100%;height:100%;object-fit:contain;transform-origin:right center;transform:translate3d(0,0,0);pointer-events:none;-webkit-user-drag:none;will-change:transform}
+#door{z-index:20;right:-10%;transition:opacity .4s ease}
+#doorOutline{z-index:19;right:-8%;transition:opacity .2s ease;animation:doorGlow 1.2s ease-in-out infinite}
+#game.settle #door,#game.settle #doorOutline{transition:transform .28s cubic-bezier(.25,.8,.25,1),opacity .2s}
+@keyframes doorGlow{0%,100%{filter:drop-shadow(0 0 4px rgba(255,255,255,.5)) drop-shadow(0 0 8px rgba(255,210,70,.4))}50%{filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 24px rgba(255,210,70,1))}}
+#tutorialText,#gameText,#finalText{position:absolute;left:50%;transform:translateX(-50%);object-fit:contain;pointer-events:none;width:86%}
+#tutorialText{z-index:50;top:64%;transition:opacity .25s}
+#gameText{z-index:50;top:54%;opacity:0;transition:opacity .35s}
+#finalText{z-index:70;top:24%;opacity:0;transition:opacity .4s}
+#hand{position:absolute;z-index:60;left:62%;top:42%;width:23%;object-fit:contain;pointer-events:none;transform:rotate(-8deg);animation:handHint 1.35s ease-in-out infinite;transition:opacity .22s,left .35s,top .35s}
+@keyframes handHint{50%{transform:translate3d(-25px,0,0) rotate(-8deg)}}
+#bulb{position:absolute;z-index:80;left:7%;top:5%;width:16%;object-fit:contain;opacity:0;transform:scale(.9);pointer-events:none;transition:opacity .35s,transform .35s,filter .2s}
+#bulb.visible{opacity:1;transform:scale(1);pointer-events:auto}
+#bulb.blink{animation:bulbBlink .65s ease-in-out infinite}
+#bulb.hit{transform:scale(1.12);filter:drop-shadow(0 0 12px #fff) drop-shadow(0 0 28px rgba(255,213,92,.95))}
+@keyframes bulbBlink{0%,100%{transform:scale(1)}50%{transform:scale(1.12);filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 25px #ffd83d)}}
+#cta{position:absolute;z-index:100;left:50%;bottom:7%;width:65%;transform:translateX(-50%) scale(.9);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s}
+#cta.visible{opacity:1;pointer-events:auto;transform:translateX(-50%) scale(1);animation:ctaPulse 1.4s ease-in-out infinite}
+@keyframes ctaPulse{0%,100%{filter:drop-shadow(0 0 0 rgba(255,255,255,0))}50%{filter:drop-shadow(0 0 14px rgba(255,255,255,.9))}}
+#soundButton{position:absolute;z-index:150;top:4%;right:4%;width:11%;aspect-ratio:1;border:none;border-radius:50%;background:rgba(0,0,0,.35);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.85}
+#soundButton:active{transform:scale(.94)}
+#vfxLayer{position:absolute;inset:0;z-index:140;pointer-events:none;overflow:hidden}
+.fx-flash,.tap-ring,.spark{position:absolute;border-radius:999px;pointer-events:none}
+.fx-flash{inset:0;background:radial-gradient(circle at center,rgba(255,255,255,.28),rgba(255,255,255,0) 62%);opacity:0;animation:flashBurst .45s ease forwards}
+@keyframes flashBurst{30%{opacity:1}100%{opacity:0}}
+.tap-ring{width:24px;height:24px;border:2px solid rgba(255,255,255,.8);box-shadow:0 0 14px rgba(255,210,77,.8);transform:translate(-50%,-50%) scale(.4);animation:tapRing .55s ease forwards}
+@keyframes tapRing{0%{opacity:0}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(3.4)}}
+.spark{width:8px;height:8px;background:#fff;box-shadow:0 0 12px rgba(255,210,77,.9);transform:translate(-50%,-50%);animation:particleFly .8s ease-out forwards}
+@keyframes particleFly{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}15%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.4)}}
+#fade{position:absolute;z-index:200;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .35s}
+#fade.active{opacity:1}
 </style>
-
 </head>
-
-
 <body>
-
-
 <div id="game">
-
-    <img
-        id="background"
-        class="layer"
-        src="assets/bg.png"
-        draggable="false"
-        decoding="async"
-        fetchpriority="high"
-    >
-
-    <img
-        id="girl"
-        class="layer"
-        src="assets/girl_1.png"
-        draggable="false"
-        decoding="async"
-        fetchpriority="high"
-    >
-
-    <img
-        id="doorOutline"
-        src="assets/door_outline.png"
-        draggable="false"
-        decoding="async"
-        fetchpriority="high"
-    >
-
-    <img
-        id="door"
-        src="assets/door.png"
-        draggable="false"
-        decoding="async"
-        fetchpriority="high"
-    >
-
-    <img
-        id="tutorialText"
-        src="assets/tutorial_text.png"
-        draggable="false"
-        decoding="async"
-        fetchpriority="high"
-    >
-
-    <img
-        id="gameText"
-        src="assets/text_35.png"
-        draggable="false"
-        decoding="async"
-        fetchpriority="high"
-    >
-
-    <img
-        id="hand"
-        src="assets/hand.png"
-        draggable="false"
-        decoding="async"
-        fetchpriority="high"
-    >
-
-    <img
-        id="bulb"
-        src="assets/bulb.png"
-        draggable="false"
-        decoding="async"
-        fetchpriority="high"
-    >
-
-    <img
-        id="finalText"
-        src="assets/final_text.png"
-        draggable="false"
-        decoding="async"
-        fetchpriority="high"
-    >
-
-    <img
-        id="cta"
-        src="assets/cta_button.png"
-        draggable="false"
-        decoding="async"
-        fetchpriority="high"
-    >
-
-    <div id="screenFeedback" aria-live="polite"></div>
+    <img id="background" class="layer" src="assets/bg.png" draggable="false" decoding="async">
+    <img id="girl" class="layer" src="assets/girl_1.png" draggable="false" decoding="async">
+    <img id="doorOutline" src="assets/door_outline.png" draggable="false" decoding="async">
+    <img id="door" src="assets/door.png" draggable="false" decoding="async">
+    <img id="tutorialText" src="assets/tutorial_text.png" draggable="false" decoding="async">
+    <img id="gameText" src="assets/text_35.png" draggable="false" decoding="async">
+    <img id="hand" src="assets/hand.png" draggable="false" decoding="async">
+    <img id="bulb" src="assets/bulb.png" draggable="false" decoding="async">
+    <img id="finalText" src="assets/final_text.png" draggable="false" decoding="async">
+    <img id="cta" src="assets/cta_button.png" draggable="false" decoding="async">
     <div id="vfxLayer"></div>
-
-    <button
-        id="soundButton"
-        type="button"
-        aria-label="Toggle sound"
-    >
-        🔊
-    </button>
-
+    <button id="soundButton" type="button" aria-label="Toggle sound">🔊</button>
     <div id="fade"></div>
-
 </div>
 
-
-<audio
-    id="music"
-    src="assets/music.mp3"
-    loop
-    preload="auto">
-</audio>
-
-
-<audio
-    id="doorSound"
-    src="assets/door_open.mp3"
-    preload="auto">
-</audio>
-
-<audio
-    id="text35Voice"
-    src="assets/text_35.mp3"
-    preload="auto">
-</audio>
-
-<audio
-    id="text50Voice"
-    src="assets/text_50.mp3"
-    preload="auto">
-</audio>
-
-<audio
-    id="text90Voice"
-    src="assets/text_90.mp3"
-    preload="auto">
-</audio>
-
-<audio
-    id="finalTextVoice"
-    src="assets/final_text.mp3"
-    preload="auto">
-</audio>
-
-
 <script>
-const game = document.getElementById("game");
-const girl = document.getElementById("girl");
-const door = document.getElementById("door");
-const doorOutline = document.getElementById("doorOutline");
-const tutorialText = document.getElementById("tutorialText");
-const gameText = document.getElementById("gameText");
-const hand = document.getElementById("hand");
-const bulb = document.getElementById("bulb");
-const finalText = document.getElementById("finalText");
-const cta = document.getElementById("cta");
-const fade = document.getElementById("fade");
-const music = document.getElementById("music");
-const doorSound = document.getElementById("doorSound");
-const text35Voice = document.getElementById("text35Voice");
-const text50Voice = document.getElementById("text50Voice");
-const text90Voice = document.getElementById("text90Voice");
-const finalTextVoice = document.getElementById("finalTextVoice");
-const soundButton = document.getElementById("soundButton");
-const screenFeedback = document.getElementById("screenFeedback");
-const vfxLayer = document.getElementById("vfxLayer");
+const $ = (id) => document.getElementById(id);
+const game = $("game"), girl = $("girl"), door = $("door"), doorOutline = $("doorOutline");
+const background = $("background"), tutorialText = $("tutorialText"), gameText = $("gameText");
+const hand = $("hand"), bulb = $("bulb"), finalText = $("finalText"), cta = $("cta");
+const fade = $("fade"), soundButton = $("soundButton"), vfxLayer = $("vfxLayer");
 
-let doorProgress = 0;
-let dragging = false;
-let startX = 0;
-let startProgress = 0;
-let tutorialStarted = false;
-let audioEnabled = true;
-let currentScene = 1;
-let finalSceneShown = false;
-let doorSoundPlayed = false;
-let voiceLocked = false;
-let currentVoice = null;
-let voiceTimeout = null;
-let interactionLocked = false;
-let audioContext = null;
-let musicGainNode = null;
-let activeTimers = [];
+const CTA_URL = "https://example.com";
+const SETTINGS = { releaseBack: 5, voiceDelay: 180, idleHintMs: 2500, thresholds: [20, 40, 80, 100] };
+const IMAGES = ["bg","girl_1","girl_2","girl_3","girl_4","girl_final","door","door_outline","bulb","hand","final_bg","tutorial_text","text_35","text_50","text_90","final_text","cta_button"].map(n => `assets/${n}.png`);
+const SOUNDS = { music: "assets/music.mp3", door: "assets/door_open.mp3", v35: "assets/text_35.mp3", v50: "assets/text_50.mp3", v90: "assets/text_90.mp3", vfinal: "assets/final_text.mp3" };
 
-const SETTINGS = {
-    maxDoorProgress: 100,
-    dragThreshold: 5,
-    releaseBack: 5,
-    scene35: 20,
-    scene50: 40,
-    scene90: 80,
-    voiceDelay: 180
-};
+let doorProgress = 0, dragging = false, startX = 0, startProgress = 0;
+let currentScene = 1, finalSceneShown = false, voiceLocked = false, interactionLocked = false;
+let audioEnabled = true, timers = [], idleTimer = null;
 
-const ASSET_LIST = [
-    "assets/bg.png",
-    "assets/girl_1.png",
-    "assets/girl_2.png",
-    "assets/girl_3.png",
-    "assets/girl_4.png",
-    "assets/girl_final.png",
-    "assets/door.png",
-    "assets/door_outline.png",
-    "assets/bulb.png",
-    "assets/hand.png",
-    "assets/final_bg.png",
-    "assets/tutorial_text.png",
-    "assets/text_35.png",
-    "assets/text_50.png",
-    "assets/text_90.png",
-    "assets/final_text.png",
-    "assets/cta_button.png",
-    "assets/music.mp3",
-    "assets/door_open.mp3",
-    "assets/text_35.mp3",
-    "assets/text_50.mp3",
-    "assets/text_90.mp3",
-    "assets/final_text.mp3"
-];
+const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+function later(fn, ms) { const id = setTimeout(fn, ms); timers.push(id); return id; }
 
-function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-}
+const Audio_ = (() => {
+    let ctx = null, master, musicGain, buffers = {}, musicStarted = false, doorNode = null, voiceNode = null;
+    const AC = window.AudioContext || window.webkitAudioContext;
 
-function scheduleTimer(callback, delay) {
-    const id = setTimeout(callback, delay);
-    activeTimers.push(id);
-    return id;
-}
-
-function clearScheduledTimers() {
-    activeTimers.forEach((id) => clearTimeout(id));
-    activeTimers = [];
-}
-
-function ensureAudioContext() {
-    if (!audioEnabled) return null;
-
-    const AudioCtor = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtor) return null;
-
-    if (!audioContext) {
-        audioContext = new AudioCtor();
-        if (music && !musicGainNode) {
-            musicGainNode = audioContext.createGain();
-            musicGainNode.gain.value = 0.35;
-            const source = audioContext.createMediaElementSource(music);
-            source.connect(musicGainNode);
-            musicGainNode.connect(audioContext.destination);
-        }
+    function ensure() {
+        if (ctx || !AC) return ctx;
+        ctx = new AC();
+        master = ctx.createGain(); master.connect(ctx.destination);
+        musicGain = ctx.createGain(); musicGain.gain.value = 0.35; musicGain.connect(master);
+        return ctx;
     }
-
-    if (audioContext.state === "suspended") {
-        audioContext.resume().catch(() => {});
+    function decode(arr) {
+        return new Promise((res, rej) => { const p = ctx.decodeAudioData(arr, res, rej); if (p && p.catch) p.catch(rej); });
     }
-
-    return audioContext;
-}
-
-function restoreMusicVolume() {
-    if (!musicGainNode) {
-        music.volume = audioEnabled ? 0.35 : 0;
-        return;
+    async function load() {
+        if (!ensure()) return;
+        await Promise.all(Object.entries(SOUNDS).map(async ([k, src]) => {
+            try { const r = await fetch(src); buffers[k] = await decode(await r.arrayBuffer()); } catch (e) {}
+        }));
     }
-    musicGainNode.gain.value = audioEnabled ? 0.35 : 0;
-}
-
-function duckMusicForVoice() {
-    if (!musicGainNode) return;
-    musicGainNode.gain.value = audioEnabled ? 0.12 : 0;
-}
-
-function startMusic() {
-    if (!audioEnabled) return;
-    ensureAudioContext();
-    restoreMusicVolume();
-    music.muted = false;
-    music.play().catch(() => {});
-}
-
-function playTone({ frequency = 440, duration = 0.12, volume = 0.04, type = "sine", slide = 0 } = {}) {
-    const ctx = ensureAudioContext();
-    if (!ctx || !audioEnabled) return;
-
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
-    if (slide) {
-        oscillator.frequency.linearRampToValueAtTime(frequency + slide, ctx.currentTime + duration);
+    // ВИКЛИКАТИ синхронно всередині user gesture
+    function unlock() {
+        if (!ensure()) return;
+        if (ctx.state !== "running") ctx.resume().catch(() => {});
+        try { const s = ctx.createBufferSource(); s.buffer = ctx.createBuffer(1, 1, 22050); s.connect(ctx.destination); s.start(0); } catch (e) {}
     }
+    function startMusic() {
+        if (musicStarted || !ctx || !buffers.music) return;
+        musicStarted = true;
+        const s = ctx.createBufferSource(); s.buffer = buffers.music; s.loop = true; s.connect(musicGain); s.start(0);
+    }
+    function playDoor() {
+        stopDoor();
+        if (!ctx || !buffers.door) return;
+        const g = ctx.createGain(); g.gain.value = 0.7; g.connect(master);
+        const s = ctx.createBufferSource(); s.buffer = buffers.door; s.connect(g); s.start(0);
+        doorNode = { s, g };
+    }
+    function stopDoor() {
+        if (!doorNode) return;
+        const { s, g } = doorNode; doorNode = null;
+        try { g.gain.setTargetAtTime(0, ctx.currentTime, 0.03); s.stop(ctx.currentTime + 0.15); } catch (e) {}
+    }
+    // повертає тривалість (сек) — завершення рахуємо таймером, тому працює й без звуку
+    function playVoice(key) {
+        stopDoor(); stopVoice();
+        const buf = buffers[key];
+        if (!ctx || !buf) return 1.8;
+        musicGain.gain.setTargetAtTime(0.12, ctx.currentTime, 0.05);
+        const s = ctx.createBufferSource(); s.buffer = buf; s.connect(master); s.start(0);
+        voiceNode = s;
+        return buf.duration;
+    }
+    function stopVoice() {
+        if (voiceNode) { try { voiceNode.stop(); } catch (e) {} voiceNode = null; }
+    }
+    function restoreMusic() { if (ctx) musicGain.gain.setTargetAtTime(0.35, ctx.currentTime, 0.15); }
+    function setEnabled(on) { if (ctx) master.gain.setTargetAtTime(on ? 1 : 0, ctx.currentTime, 0.02); }
+    function suspend() { if (ctx && ctx.state === "running") ctx.suspend().catch(() => {}); }
+    function resume() { if (ctx && audioEnabled && ctx.state !== "running") ctx.resume().catch(() => {}); }
+    function tone(o = {}) {
+        if (!ctx || !audioEnabled) return;
+        const { frequency = 440, duration = 0.12, volume = 0.04, type = "sine", slide = 0 } = o;
+        const t = ctx.currentTime, osc = ctx.createOscillator(), g = ctx.createGain();
+        osc.type = type; osc.frequency.setValueAtTime(frequency, t);
+        if (slide) osc.frequency.linearRampToValueAtTime(frequency + slide, t + duration);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(volume, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+        osc.connect(g); g.connect(master); osc.start(t); osc.stop(t + duration + 0.03);
+    }
+    return { load, unlock, startMusic, playDoor, stopDoor, playVoice, stopVoice, restoreMusic, setEnabled, suspend, resume, tone };
+})();
 
-    gainNode.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.02);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + duration + 0.03);
-}
-
+/* ---------- VFX ---------- */
 function triggerScreenShake() {
-    game.classList.remove("shake");
-    void game.offsetWidth;
-    game.classList.add("shake");
-    scheduleTimer(() => game.classList.remove("shake"), 500);
+    game.classList.remove("shake"); void game.offsetWidth; game.classList.add("shake");
+    later(() => game.classList.remove("shake"), 500);
 }
-
 function triggerFlash() {
-    const flash = document.createElement("div");
-    flash.className = "fx-flash";
-    vfxLayer.appendChild(flash);
-    scheduleTimer(() => flash.remove(), 500);
+    const f = document.createElement("div"); f.className = "fx-flash"; vfxLayer.appendChild(f);
+    later(() => f.remove(), 500);
 }
-
-function triggerTapEffect(clientX, clientY) {
-    const rect = game.getBoundingClientRect();
-    const ring = document.createElement("div");
-    ring.className = "tap-ring";
-    ring.style.left = `${clientX - rect.left}px`;
-    ring.style.top = `${clientY - rect.top}px`;
-    vfxLayer.appendChild(ring);
-    scheduleTimer(() => ring.remove(), 550);
-
-    for (let i = 0; i < 8; i += 1) {
-        const spark = document.createElement("div");
-        spark.className = "spark";
-        spark.style.left = `${clientX - rect.left}px`;
-        spark.style.top = `${clientY - rect.top}px`;
-        spark.style.background = "rgba(255,255,255,.9)";
-        spark.style.setProperty("--dx", `${(Math.random() - 0.5) * 100}px`);
-        spark.style.setProperty("--dy", `${(Math.random() - 0.5) * 100}px`);
-        vfxLayer.appendChild(spark);
-        scheduleTimer(() => spark.remove(), 800);
+function triggerTapEffect(x, y) {
+    const r = game.getBoundingClientRect(), px = x - r.left, py = y - r.top;
+    const ring = document.createElement("div"); ring.className = "tap-ring";
+    ring.style.left = px + "px"; ring.style.top = py + "px"; vfxLayer.appendChild(ring);
+    later(() => ring.remove(), 550);
+    for (let i = 0; i < 8; i++) {
+        const s = document.createElement("div"); s.className = "spark";
+        s.style.left = px + "px"; s.style.top = py + "px";
+        s.style.setProperty("--dx", (Math.random() - 0.5) * 100 + "px");
+        s.style.setProperty("--dy", (Math.random() - 0.5) * 100 + "px");
+        vfxLayer.appendChild(s); later(() => s.remove(), 800);
     }
 }
 
-function showScreenFeedback(label) {
-    if (!screenFeedback) return;
-    screenFeedback.textContent = label;
-    screenFeedback.classList.remove("visible");
-    void screenFeedback.offsetWidth;
-    screenFeedback.classList.add("visible");
-    scheduleTimer(() => screenFeedback.classList.remove("visible"), 900);
-}
-
+/* ---------- GAME ---------- */
 function init() {
-    doorProgress = 0;
-    currentScene = 1;
-    finalSceneShown = false;
-    tutorialStarted = false;
-    doorSoundPlayed = false;
-    voiceLocked = false;
-    currentVoice = null;
-    interactionLocked = false;
-    dragging = false;
-    clearTimeout(voiceTimeout);
-    voiceTimeout = null;
-    clearScheduledTimers();
-
-    door.style.transform = "translate3d(0,0,0)";
-    doorOutline.style.transform = "translate3d(0,0,0)";
-    door.style.opacity = "1";
-    doorOutline.style.opacity = "1";
-    door.style.display = "block";
-    doorOutline.style.display = "block";
-    hand.style.display = "block";
-    tutorialText.style.opacity = "1";
-    hand.style.opacity = "1";
-    hand.style.left = "62%";
-    hand.style.top = "42%";
-    gameText.style.opacity = "0";
+    timers.forEach(clearTimeout); timers = [];
+    doorProgress = 0; currentScene = 1; finalSceneShown = false;
+    voiceLocked = false; interactionLocked = false; dragging = false;
+    updateDoor();
+    door.style.opacity = doorOutline.style.opacity = "1";
+    door.style.display = doorOutline.style.display = hand.style.display = "block";
+    tutorialText.style.opacity = hand.style.opacity = "1";
+    hand.style.left = "62%"; hand.style.top = "42%";
+    gameText.style.opacity = finalText.style.opacity = "0";
     bulb.classList.remove("visible", "blink", "hit");
-    finalText.style.opacity = "0";
     cta.classList.remove("visible");
-    game.classList.remove("final-scene", "shake");
-    screenFeedback.classList.remove("visible");
-}
-
-function startTutorialInteraction() {
-    if (tutorialStarted) return;
-    tutorialStarted = true;
-    tutorialText.style.opacity = "0";
-    hand.style.opacity = "0";
-    startMusic();
-}
-
-function playDoorSound() {
-    if (!audioEnabled || !doorSound) return;
-    try { doorSound.pause(); } catch (error) {}
-    doorSound.currentTime = 0;
-    doorSound.volume = 0.7;
-    doorSound.muted = false;
-    doorSoundPlayed = true;
-    doorSound.play().catch(() => {});
-    playTone({ frequency: 220, duration: 0.08, volume: 0.025, type: "triangle", slide: 80 });
-}
-
-function stopDoorSound() {
-    if (doorSound) {
-        doorSound.pause();
-        doorSound.currentTime = 0;
-    }
-    doorSoundPlayed = false;
-}
-
-function stopVoice() {
-    clearTimeout(voiceTimeout);
-    voiceTimeout = null;
-    if (currentVoice) {
-        currentVoice.pause();
-        currentVoice.currentTime = 0;
-    }
-    currentVoice = null;
-    voiceLocked = false;
-    restoreMusicVolume();
+    background.src = "assets/bg.png";
 }
 
 function updateDoor() {
-    const distance = (doorProgress / 100) * game.clientWidth;
-    const doorOffset = `translate3d(${distance}px, 0, 0)`;
-    door.style.transform = doorOffset;
-    doorOutline.style.transform = doorOffset;
-
-    if (dragging) {
-        doorOutline.style.opacity = "0";
-    }
+    const t = `translate3d(${(doorProgress / 100) * game.clientWidth}px,0,0)`;
+    door.style.transform = doorOutline.style.transform = t;
 }
 
-function setDoorProgress(value) {
-    doorProgress = clamp(value, 0, SETTINGS.maxDoorProgress);
+function setDoorProgress(v) {
+    const cap = SETTINGS.thresholds[currentScene - 1] ?? 100;
+    doorProgress = clamp(v, 0, cap);
     updateDoor();
-    checkScenes();
+    if (doorProgress >= cap) advanceScene();
+}
+
+function advanceScene() {
+    if (currentScene === 1) scene35();
+    else if (currentScene === 2) scene50();
+    else if (currentScene === 3) scene90();
 }
 
 function changeGirl(src) {
-    girl.style.opacity = "0";
-    girl.style.transform = "scale(1.04)";
-
-    scheduleTimer(() => {
-        girl.src = src;
-        girl.style.opacity = "1";
-        girl.style.transform = "scale(1)";
-    }, 180);
+    girl.style.opacity = "0"; girl.style.transform = "scale(1.04)";
+    later(() => { girl.src = src; girl.style.opacity = "1"; girl.style.transform = "scale(1)"; }, 180);
 }
 
-function playVoice(audioElement, options = {}) {
-    const { delayMs = SETTINGS.voiceDelay, hideText = false, onEnded = null } = options;
-
-    if (!audioEnabled || !audioElement) return;
-
-    if (currentVoice && currentVoice !== audioElement) {
-        currentVoice.pause();
-        currentVoice.currentTime = 0;
-    }
-
-    clearTimeout(voiceTimeout);
-    duckMusicForVoice();
-    voiceLocked = true;
-    currentVoice = audioElement;
-    dragging = false;
-
-    const startPlayback = function() {
-        stopDoorSound();
-        audioElement.currentTime = 0;
-        audioElement.volume = 1;
-
-        audioElement.onended = function() {
+function playVoice(key, { onDone } = {}) {
+    voiceLocked = true; dragging = false;
+    clearTimeout(idleTimer);
+    Audio_.stopDoor();
+    later(() => {
+        const dur = Audio_.playVoice(key);
+        later(() => {
             voiceLocked = false;
-            currentVoice = null;
-            restoreMusicVolume();
-            if (hideText) gameText.style.opacity = "0";
-            doorOutline.style.opacity = "1";
+            Audio_.restoreMusic();
+            gameText.style.opacity = "0";
+            if (!finalSceneShown) { doorOutline.style.opacity = "1"; hand.style.opacity = "1"; }
+            if (onDone) onDone();
+            armIdle();
+        }, dur * 1000 + 100);
+    }, SETTINGS.voiceDelay);
+}
+
+function armIdle() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+        if (!dragging && !voiceLocked && !finalSceneShown) {
             hand.style.opacity = "1";
-            if (typeof onEnded === "function") onEnded();
-        };
-
-        try {
-            audioElement.play().catch(() => {
-                voiceLocked = false;
-                currentVoice = null;
-                restoreMusicVolume();
-                if (hideText) gameText.style.opacity = "0";
-            });
-        } catch (error) {
-            voiceLocked = false;
-            currentVoice = null;
-            restoreMusicVolume();
-            if (hideText) gameText.style.opacity = "0";
+            if (currentScene < 4) doorOutline.style.opacity = "1";
         }
-    };
-
-    voiceTimeout = setTimeout(startPlayback, delayMs);
+    }, SETTINGS.idleHintMs);
 }
 
-function checkScenes() {
-    if (doorProgress >= SETTINGS.scene35 && currentScene < 2) scene35();
-    if (doorProgress >= SETTINGS.scene50 && currentScene < 3) scene50();
-    if (doorProgress >= SETTINGS.scene90 && currentScene < 4) scene90();
-}
+function showText(src) { gameText.src = src; gameText.style.opacity = "1"; }
 
 function scene35() {
     currentScene = 2;
-    changeGirl("assets/girl_2.png");
-    gameText.src = "assets/text_35.png";
-    gameText.style.opacity = "1";
-    playVoice(text35Voice, { hideText: true, delayMs: SETTINGS.voiceDelay });
+    changeGirl("assets/girl_2.png"); showText("assets/text_35.png");
+    playVoice("v35");
     bulb.classList.add("visible");
-    showScreenFeedback("");
-    triggerFlash();
-    playTone({ frequency: 520, duration: 0.16, volume: 0.03, type: "triangle", slide: 90 });
+    triggerFlash(); Audio_.tone({ frequency: 520, duration: .16, volume: .03, type: "triangle", slide: 90 });
 }
-
 function scene50() {
     currentScene = 3;
-    changeGirl("assets/girl_3.png");
-    gameText.src = "assets/text_50.png";
-    gameText.style.opacity = "1";
-    playVoice(text50Voice, { hideText: true, delayMs: SETTINGS.voiceDelay });
-    showScreenFeedback("");
-    triggerScreenShake();
-    playTone({ frequency: 660, duration: 0.14, volume: 0.04, type: "sawtooth", slide: 120 });
+    changeGirl("assets/girl_3.png"); showText("assets/text_50.png");
+    playVoice("v50");
+    triggerScreenShake(); Audio_.tone({ frequency: 660, duration: .14, volume: .04, type: "sawtooth", slide: 120 });
 }
-
 function scene90() {
     currentScene = 4;
-    changeGirl("assets/girl_4.png");
-    door.style.transition = "transform .4s ease, opacity .4s ease";
-    doorOutline.style.transition = "transform .4s ease, opacity .4s ease";
-    door.style.opacity = "0";
-    doorOutline.style.opacity = "0";
-    door.style.display = "none";
-    doorOutline.style.display = "none";
-    gameText.src = "assets/text_90.png";
-    gameText.style.opacity = "1";
-    playVoice(text90Voice, { hideText: true, delayMs: SETTINGS.voiceDelay });
+    changeGirl("assets/girl_4.png"); showText("assets/text_90.png");
+    door.style.opacity = doorOutline.style.opacity = "0";
+    later(() => { door.style.display = doorOutline.style.display = "none"; }, 450);
     bulb.classList.add("visible", "blink");
-    hand.style.left = "17%";
-    hand.style.top = "15%";
-    hand.style.opacity = "1";
-    showScreenFeedback("");
-    triggerFlash();
-    playTone({ frequency: 780, duration: 0.18, volume: 0.05, type: "square", slide: 150 });
+    hand.style.left = "17%"; hand.style.top = "15%";
+    playVoice("v90");
+    triggerFlash(); Audio_.tone({ frequency: 780, duration: .18, volume: .05, type: "square", slide: 150 });
 }
 
 function releaseDoor() {
     if (!dragging) return;
-
     dragging = false;
-    stopDoorSound();
-
-    const targetProgress = Math.max(0, doorProgress - SETTINGS.releaseBack);
-    door.style.transition = "transform .28s cubic-bezier(.25,.8,.25,1)";
-    setDoorProgress(targetProgress);
-
-    scheduleTimer(() => {
-        door.style.transition = "transform .08s linear";
-        if (!finalSceneShown && doorProgress < SETTINGS.scene90) {
-            doorOutline.style.opacity = "1";
-            hand.style.opacity = "1";
-        }
-    }, 300);
-
-    if (!finalSceneShown && doorProgress < SETTINGS.scene90) {
-        doorOutline.style.opacity = "1";
-        hand.style.opacity = "1";
-    }
+    Audio_.stopDoor();
+    game.classList.add("settle");
+    setDoorProgress(Math.max(0, doorProgress - SETTINGS.releaseBack));
+    later(() => game.classList.remove("settle"), 320);
+    if (!finalSceneShown && !voiceLocked && currentScene < 4) doorOutline.style.opacity = "1";
+    armIdle();
 }
 
 function showFinalScene() {
     if (finalSceneShown || interactionLocked) return;
-
-    interactionLocked = true;
-    finalSceneShown = true;
-    currentScene = 5;
-    dragging = false;
-
-    hand.style.opacity = "0";
+    interactionLocked = finalSceneShown = true;
+    currentScene = 5; dragging = false;
+    clearTimeout(idleTimer);
     hand.style.display = "none";
-    game.classList.add("final-scene");
     fade.classList.add("active");
     bulb.classList.remove("blink", "visible");
-    triggerFlash();
-    triggerScreenShake();
-    showScreenFeedback("");
-    playTone({ frequency: 960, duration: 0.25, volume: 0.06, type: "triangle", slide: 200 });
-    playVoice(finalTextVoice, { delayMs: SETTINGS.voiceDelay });
+    triggerFlash(); triggerScreenShake();
+    Audio_.tone({ frequency: 960, duration: .25, volume: .06, type: "triangle", slide: 200 });
+    Audio_.playVoice("vfinal");
 
-    scheduleTimer(() => {
-        girl.src = "assets/girl_final.png";
-        girl.style.opacity = "0";
-        gameText.style.opacity = "0";
-        tutorialText.style.opacity = "0";
-        hand.style.opacity = "0";
-        door.style.display = "none";
-        doorOutline.style.display = "none";
+    later(() => {
+        background.src = "assets/final_bg.png";
+        girl.src = "assets/girl_final.png"; girl.style.opacity = "0";
+        gameText.style.opacity = tutorialText.style.opacity = "0";
+        door.style.display = doorOutline.style.display = "none";
         finalText.style.opacity = "1";
-
-        scheduleTimer(() => {
-            girl.style.opacity = "1";
-            cta.classList.add("visible");
-            interactionLocked = false;
-        }, 150);
-
-        scheduleTimer(() => fade.classList.remove("active"), 250);
+        later(() => { girl.style.opacity = "1"; cta.classList.add("visible"); interactionLocked = false; }, 150);
+        later(() => fade.classList.remove("active"), 250);
     }, 350);
 }
 
-function preloadAssets() {
-    ASSET_LIST.forEach((src) => {
-        if (src.endsWith(".mp3")) {
-            const audio = new Audio();
-            audio.preload = "auto";
-            audio.src = src;
-            return;
-        }
-
-        const img = new Image();
-        img.decoding = "async";
-        img.src = src;
-    });
+function openStore() {
+    try { if (window.mraid && typeof mraid.open === "function") { mraid.open(CTA_URL); return; } } catch (e) {}
+    window.open(CTA_URL, "_blank");
 }
 
-if (typeof requestIdleCallback === "function") {
-    requestIdleCallback(preloadAssets);
-} else {
-    setTimeout(preloadAssets, 150);
-}
+/* ---------- INPUT ---------- */
+game.addEventListener("pointerdown", (e) => {
+    Audio_.unlock();                  // синхронно в жесті — критично для iOS
+    Audio_.startMusic();
+    if (e.target === bulb || e.target === cta || e.target === soundButton) return;
+    if (voiceLocked || interactionLocked || finalSceneShown) return;
 
-game.addEventListener("pointerdown", function(event) {
-    if (event.target === bulb || event.target === cta || event.target === soundButton) return;
-    if (voiceLocked || interactionLocked) return;
-    if (finalSceneShown) return;
-
-    startTutorialInteraction();
-    doorSoundPlayed = false;
-    dragging = true;
-    startX = event.clientX;
-    startProgress = doorProgress;
-
-    tutorialText.style.opacity = "0";
-    hand.style.opacity = "0";
-    doorOutline.style.opacity = "0";
-    triggerTapEffect(event.clientX, event.clientY);
-    startMusic();
-    stopDoorSound();
-    playDoorSound();
-
-    try { game.setPointerCapture(event.pointerId); } catch (error) {}
+    dragging = true; startX = e.clientX; startProgress = doorProgress;
+    clearTimeout(idleTimer);
+    tutorialText.style.opacity = hand.style.opacity = doorOutline.style.opacity = "0";
+    triggerTapEffect(e.clientX, e.clientY);
+    Audio_.playDoor();
+    try { game.setPointerCapture(e.pointerId); } catch (err) {}
 });
 
-game.addEventListener("pointermove", function(event) {
+game.addEventListener("pointermove", (e) => {
     if (!dragging || voiceLocked || interactionLocked) return;
-
-    const delta = event.clientX - startX;
-    if (delta <= 0) {
-        if (dragging) stopDoorSound();
-        return;
-    }
-
-    if (Math.abs(delta) > SETTINGS.dragThreshold) {
-        tutorialText.style.opacity = "0";
-        hand.style.opacity = "0";
-        doorOutline.style.opacity = "0";
-        if (!doorSoundPlayed) playDoorSound();
-    }
-
-    const progressChange = (delta / game.clientWidth) * 100;
-    setDoorProgress(startProgress + progressChange);
+    const delta = e.clientX - startX;
+    if (delta <= 0) return;
+    setDoorProgress(startProgress + (delta / game.clientWidth) * 100);
 });
-
 game.addEventListener("pointerup", releaseDoor);
 game.addEventListener("pointercancel", releaseDoor);
 
-bulb.addEventListener("pointerdown", function(event) {
-    event.stopPropagation();
+bulb.addEventListener("pointerdown", (e) => {
+    e.stopPropagation();
+    Audio_.unlock();
     if (currentScene < 4 || finalSceneShown || voiceLocked || interactionLocked) return;
-
     bulb.classList.add("hit");
-    triggerTapEffect(event.clientX, event.clientY);
-    triggerFlash();
-    scheduleTimer(() => bulb.classList.remove("hit"), 220);
+    triggerTapEffect(e.clientX, e.clientY); triggerFlash();
+    later(() => bulb.classList.remove("hit"), 220);
     showFinalScene();
 });
 
-cta.addEventListener("pointerdown", function(event) {
-    event.stopPropagation();
-    triggerTapEffect(event.clientX, event.clientY);
-    playTone({ frequency: 880, duration: 0.12, volume: 0.04, type: "triangle", slide: 120 });
-    window.open("https://example.com", "_blank");
+cta.addEventListener("pointerdown", (e) => e.stopPropagation());
+cta.addEventListener("click", (e) => {
+    e.stopPropagation();
+    triggerTapEffect(e.clientX, e.clientY);
+    Audio_.tone({ frequency: 880, duration: .12, volume: .04, type: "triangle", slide: 120 });
+    openStore();
 });
 
-soundButton.addEventListener("pointerdown", function(event) {
-    event.stopPropagation();
-    triggerTapEffect(event.clientX, event.clientY);
-});
-
-soundButton.addEventListener("click", function(event) {
-    event.stopPropagation();
+soundButton.addEventListener("pointerdown", (e) => { e.stopPropagation(); Audio_.unlock(); });
+soundButton.addEventListener("click", (e) => {
+    e.stopPropagation();
     audioEnabled = !audioEnabled;
-
-    if (audioEnabled) {
-        soundButton.textContent = "🔊";
-        startMusic();
-    } else {
-        soundButton.textContent = "🔇";
-        music.pause();
-        if (musicGainNode) musicGainNode.gain.value = 0;
-    }
-    restoreMusicVolume();
+    soundButton.textContent = audioEnabled ? "🔊" : "🔇";
+    Audio_.setEnabled(audioEnabled);
+    if (audioEnabled) Audio_.resume();
 });
 
-document.querySelectorAll("img").forEach(function(image) {
-    image.addEventListener("dragstart", function(event) {
-        event.preventDefault();
-    });
-});
+game.addEventListener("contextmenu", (e) => e.preventDefault());
+window.addEventListener("resize", updateDoor);
+window.addEventListener("orientationchange", () => setTimeout(updateDoor, 200));
+document.addEventListener("visibilitychange", () => document.hidden ? Audio_.suspend() : Audio_.resume());
+window.addEventListener("pagehide", Audio_.suspend);
 
-game.addEventListener("contextmenu", function(event) {
-    event.preventDefault();
-});
-
-window.addEventListener("resize", function() {
-    updateDoor();
-});
-
+function loadImages() {
+    return Promise.all(IMAGES.map((src) => new Promise((res) => {
+        const img = new Image(); img.src = src;
+        (img.decode ? img.decode() : Promise.reject()).then(res, () => { img.onload = img.onerror = res; if (img.complete) res(); });
+    })));
+}
 init();
+Promise.race([Promise.all([loadImages(), Audio_.load()]), new Promise((r) => setTimeout(r, 4000))])
+    .then(() => { game.classList.add("ready"); armIdle(); });
 </script>
-
 </body>
 </html>
