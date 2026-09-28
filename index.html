@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Sliding Door Playable</title>
-<link rel="preload" href="assets/bg.png" as="image">
-<link rel="preload" href="assets/girl_1.png" as="image">
-<link rel="preload" href="assets/door.png" as="image">
-<link rel="preload" href="assets/door_outline.png" as="image">
+<link rel="preload" href="assets/bg.webp" as="image">
+<link rel="preload" href="assets/girl_1.webp" as="image">
+<link rel="preload" href="assets/door.webp" as="image">
+<link rel="preload" href="assets/door_outline.webp" as="image">
 <style>
 :root{--bg:#000;--ease:cubic-bezier(.22,.8,.25,1)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -47,9 +47,15 @@ body{display:flex;justify-content:center;align-items:center}
 .txt.gone{opacity:0;filter:blur(8px);transform:translateX(-50%) scale(1.06)}
 #tutorialText{z-index:50;top:64%}
 #gameText{z-index:50;top:54%}
-#finalText{z-index:70;top:24%}
-#hand{position:absolute;z-index:60;left:62%;top:42%;width:23%;object-fit:contain;pointer-events:none;transform:rotate(-8deg);animation:handHint 1.35s ease-in-out infinite;transition:opacity .22s,left .35s,top .35s}
+#finalText{z-index:70;top:54%;pointer-events:none;cursor:pointer;display:block;text-decoration:none;filter:drop-shadow(0 0 10px rgba(255,233,145,.2));}
+#hand{position:absolute;z-index:60;left:62%;top:42%;width:23%;object-fit:contain;pointer-events:none;transform:rotate(-8deg);animation:handHint 1.35s ease-in-out infinite;transition:opacity .22s,left .35s,top .35s;filter:drop-shadow(0 0 8px rgba(255,255,255,.7));}
+#hand.finalHint{animation:handPoint 1.1s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(255,255,255,.9));}
 @keyframes handHint{50%{transform:translate3d(-25px,0,0) rotate(-8deg)}}
+@keyframes handPoint{0%{transform:translate3d(0,0,0) rotate(-10deg) scale(1)}25%{transform:translate3d(8px,8px,0) rotate(-18deg) scale(1.04)}50%{transform:translate3d(18px,18px,0) rotate(-22deg) scale(1.1)}75%{transform:translate3d(8px,8px,0) rotate(-18deg) scale(1.04)}100%{transform:translate3d(0,0,0) rotate(-10deg) scale(1)}}
+@keyframes finalTextPulse{0%,100%{transform:translateX(-50%) scale(1);filter:drop-shadow(0 0 0 rgba(255,247,196,0)) brightness(1)}25%{transform:translateX(-50%) scale(1.03);filter:drop-shadow(0 0 16px rgba(255,247,196,.9)) brightness(1.13)}50%{transform:translateX(-50%) scale(1.06);filter:drop-shadow(0 0 26px rgba(255,204,95,.95)) brightness(1.2)}75%{transform:translateX(-50%) scale(1.03);filter:drop-shadow(0 0 18px rgba(255,247,196,.9)) brightness(1.15)}}
+#finalText img{display:block;width:100%;pointer-events:none;-webkit-user-drag:none}
+#finalText.show{animation:finalTextPulse 1.5s ease-in-out infinite;}
+#finalText:active{transform:translateX(-50%) scale(.98)}
 /* bulb */
 #bulb{position:absolute;z-index:80;left:7%;top:5%;width:16%;object-fit:contain;opacity:0;transform:scale(.9);pointer-events:none;transition:opacity .35s,transform .35s,filter .2s}
 #bulb.visible{opacity:1;transform:scale(1);pointer-events:auto}
@@ -63,15 +69,6 @@ body{display:flex;justify-content:center;align-items:center}
 #bulbHalo b{position:absolute;inset:12%;border-radius:50%;background:radial-gradient(circle,rgba(255,230,140,.6),transparent 70%);animation:haloGlow 1.2s ease-in-out infinite}
 @keyframes halo{0%{transform:scale(.5);opacity:.9}100%{transform:scale(1.5);opacity:0}}
 @keyframes haloGlow{50%{transform:scale(1.3);opacity:.6}}
-/* CTA with light sweep */
-#cta{position:absolute;z-index:100;left:50%;bottom:7%;width:65%;transform:translateX(-50%) scale(.9);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s}
-#cta img{display:block;width:100%;pointer-events:none;-webkit-user-drag:none}
-#cta::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.9) 50%,transparent 62%);background-size:260% 100%;background-position:160% 0;-webkit-mask:url(assets/cta_button.png) center/100% 100% no-repeat;mask:url(assets/cta_button.png) center/100% 100% no-repeat}
-#cta.visible{opacity:1;pointer-events:auto;transform:translateX(-50%) scale(1);animation:ctaPulse 1.4s ease-in-out infinite}
-#cta.visible::after{animation:ctaSweep 2.4s ease-in-out infinite}
-#cta:active{transform:translateX(-50%) scale(.97)}
-@keyframes ctaPulse{0%,100%{filter:drop-shadow(0 0 0 rgba(255,255,255,0))}50%{filter:drop-shadow(0 0 14px rgba(255,255,255,.9))}}
-@keyframes ctaSweep{0%{background-position:160% 0}55%,100%{background-position:-60% 0}}
 #soundButton{position:absolute;z-index:150;top:4%;right:4%;width:11%;aspect-ratio:1;border:none;border-radius:50%;background:rgba(0,0,0,.35);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.85}
 #soundButton:active{transform:scale(.94)}
 #fx{position:absolute;inset:0;width:100%;height:100%;z-index:140;pointer-events:none}
@@ -95,21 +92,22 @@ body{display:flex;justify-content:center;align-items:center}
 </head>
 <body>
 <div id="game" class="blurred">
-    <img id="background" class="layer" src="assets/bg.png" draggable="false" decoding="async">
+    <img id="background" class="layer" src="assets/bg.webp" draggable="false" decoding="async">
     <div id="atmo"></div>
-    <div id="girlParallax"><div id="girlWrap"><img id="girl" class="layer" src="assets/girl_1.png" draggable="false" decoding="async"></div></div>
+    <div id="girlParallax"><div id="girlWrap"><img id="girl" class="layer" src="assets/girl_1.webp" draggable="false" decoding="async"></div></div>
     <div id="vignette"></div>
-    <img id="doorTrail" src="assets/door_outline.png" draggable="false" decoding="async">
-    <img id="doorOutline" src="assets/door_outline.png" draggable="false" decoding="async">
-    <img id="door" src="assets/door.png" draggable="false" decoding="async">
+    <img id="doorTrail" src="assets/door_outline.webp" draggable="false" decoding="async">
+    <img id="doorOutline" src="assets/door_outline.webp" draggable="false" decoding="async">
+    <img id="door" src="assets/door.webp" draggable="false" decoding="async">
     <div id="burst"></div>
-    <img id="tutorialText" class="txt" src="assets/tutorial_text.png" draggable="false" decoding="async">
-    <img id="gameText" class="txt" src="assets/text_35.png" draggable="false" decoding="async">
-    <img id="hand" src="assets/hand.png" draggable="false" decoding="async">
+    <img id="tutorialText" class="txt" src="assets/tutorial_text.webp" draggable="false" decoding="async">
+    <img id="gameText" class="txt" src="assets/text_35.webp" draggable="false" decoding="async">
+    <img id="hand" src="assets/hand.webp" draggable="false" decoding="async">
     <div id="bulbHalo"><i></i><i></i><b></b></div>
-    <img id="bulb" src="assets/bulb.png" draggable="false" decoding="async">
-    <img id="finalText" class="txt" src="assets/final_text.png" draggable="false" decoding="async">
-    <div id="cta"><img src="assets/cta_button.png" draggable="false" decoding="async"></div>
+    <img id="bulb" src="assets/bulb.webp" draggable="false" decoding="async">
+    <a id="finalText" class="txt" href="https://example.com" target="_blank" rel="noopener noreferrer" aria-label="Open website">
+        <img src="assets/final_text.webp" draggable="false" decoding="async" alt="Final text">
+    </a>
     <canvas id="fx"></canvas>
     <button id="soundButton" type="button" aria-label="Toggle sound">🔊</button>
     <div id="fade"></div>
@@ -124,12 +122,12 @@ const $ = (id) => document.getElementById(id);
 const game = $("game"), girl = $("girl"), girlParallax = $("girlParallax"), door = $("door"), doorOutline = $("doorOutline"), doorTrail = $("doorTrail");
 const startScreen = $("startScreen"), startButton = $("startButton");
 const background = $("background"), tutorialText = $("tutorialText"), gameText = $("gameText"), hand = $("hand");
-const bulb = $("bulb"), halo = $("bulbHalo"), finalText = $("finalText"), cta = $("cta"), fade = $("fade");
+const bulb = $("bulb"), halo = $("bulbHalo"), finalText = $("finalText"), fade = $("fade");
 const whiteFlash = $("whiteFlash"), burstEl = $("burst"), soundButton = $("soundButton"), fx = $("fx"), fctx = fx.getContext("2d");
 
-const CTA_URL = "https://example.com";
+const SITE_URL = "https://example.com";
 const SETTINGS = { releaseBack: 5, voiceDelay: 180, idleHintMs: 2500, thresholds: [20, 40, 80, 100] };
-const IMAGES = ["bg","girl_1","girl_2","girl_3","girl_4","girl_final","door","door_outline","bulb","hand","final_bg","tutorial_text","text_35","text_50","text_90","final_text","cta_button"].map(n => `assets/${n}.png`);
+const IMAGES = ["bg","girl_1","girl_2","girl_3","girl_4","girl_final","door","door_outline","bulb","hand","final_bg","tutorial_text","text_35","text_50","text_90","final_text"].map(n => `assets/${n}.webp `);
 const SOUNDS = { music: "assets/music.mp3", door: "assets/door_open.mp3", v35: "assets/text_35.mp3", v50: "assets/text_50.mp3", v90: "assets/text_90.mp3", vfinal: "assets/final_text.mp3" };
 
 let doorProgress = 0, dragging = false, startX = 0, lastX = 0, startProgress = 0, moveSpeed = 0;
@@ -307,6 +305,17 @@ function setText(el, on) {
     } else if (el.classList.contains("show")) { el.classList.remove("show"); el.classList.add("gone"); }
 }
 function showText(src) { gameText.src = src; setText(gameText, true); }
+function placeFinalHint() {
+    const gameRect = game.getBoundingClientRect();
+    const rect = finalText.getBoundingClientRect();
+    const x = rect.left - gameRect.left + rect.width * 0.7;
+    const y = rect.top - gameRect.top + rect.height * 0.86;
+    hand.style.left = `${x}px`;
+    hand.style.top = `${y}px`;
+    hand.style.opacity = "1";
+    hand.style.display = "block";
+    hand.classList.add("finalHint");
+}
 
 /* ---------- GAME ---------- */
 function placeHalo() {
@@ -324,8 +333,8 @@ function init() {
     hand.style.opacity = "1"; hand.style.left = "62%"; hand.style.top = "42%";
     setText(tutorialText, true);
     bulb.classList.remove("visible", "blink", "hit"); halo.classList.remove("on");
-    cta.classList.remove("visible");
-    background.src = "assets/bg.png";
+    finalText.style.pointerEvents = "none";
+    background.src = "assets/bg.webp";
 }
 
 function updateDoor() {
@@ -376,17 +385,17 @@ function armIdle() {
 }
 
 function scene35() {
-    currentScene = 2; changeGirl("assets/girl_2.png"); showText("assets/text_35.png"); playVoice("v35");
+    currentScene = 2; changeGirl("assets/girl_2.webp"); showText("assets/text_35.webp"); playVoice("v35");
     bulb.classList.add("visible"); placeHalo();
     Audio_.tone({ frequency: 520, duration: .16, volume: .03, type: "triangle", slide: 90 });
 }
 function scene50() {
-    currentScene = 3; changeGirl("assets/girl_3.png"); showText("assets/text_50.png"); playVoice("v50");
+    currentScene = 3; changeGirl("assets/girl_3.webp"); showText("assets/text_50.webp"); playVoice("v50");
     triggerScreenShake();
     Audio_.tone({ frequency: 660, duration: .14, volume: .04, type: "sawtooth", slide: 120 });
 }
 function scene90() {
-    currentScene = 4; changeGirl("assets/girl_4.png"); showText("assets/text_90.png");
+    currentScene = 4; changeGirl("assets/girl_4.webp"); showText("assets/text_90.webp");
     door.style.opacity = doorOutline.style.opacity = doorTrail.style.opacity = "0";
     later(() => { door.style.display = doorOutline.style.display = doorTrail.style.display = "none"; }, 450);
     burstEl.classList.remove("go"); void burstEl.offsetWidth; burstEl.classList.add("go");   // light burst
@@ -412,15 +421,15 @@ function showFinalScene() {
     if (finalSceneShown || interactionLocked) return;
     interactionLocked = finalSceneShown = true; currentScene = 5;
     stopDrag(); clearTimeout(idleTimer);
-    hand.style.display = "none"; halo.classList.remove("on"); bulb.classList.remove("blink", "visible");
+    hand.style.display = "none"; hand.classList.remove("finalHint"); halo.classList.remove("on"); bulb.classList.remove("blink", "visible");
     setText(gameText, false); setText(tutorialText, false);
     fade.classList.add("active");
     Audio_.tone({ frequency: 960, duration: .25, volume: .06, type: "triangle", slide: 200 });
     Audio_.playVoice("vfinal");
 
     later(() => {
-        background.src = "assets/final_bg.png";
-        girl.src = "assets/girl_final.png";
+        background.src = "assets/final_bg.webp";
+        girl.src = "assets/girl_final.webp";
         girl.style.transition = "none"; girl.style.opacity = "0"; girl.style.filter = "blur(12px) brightness(2)"; girl.style.transform = "scale(1.1)";
         door.style.display = doorOutline.style.display = doorTrail.style.display = "none";
         whiteFlash.classList.remove("go"); void whiteFlash.offsetWidth; whiteFlash.classList.add("go");
@@ -431,14 +440,19 @@ function showFinalScene() {
             girl.style.transition = "opacity .5s,transform .8s var(--ease),filter .7s";
             girl.style.opacity = "1"; girl.style.transform = "scale(1)"; girl.style.filter = "none";
         }, 80);
-        later(() => setText(finalText, true), 650);
-        later(() => { cta.classList.add("visible"); interactionLocked = false; }, 1250);
+        later(() => {
+            setText(finalText, true);
+            finalText.style.pointerEvents = "auto";
+            finalText.classList.add("show");
+            placeFinalHint();
+            interactionLocked = false;
+        }, 650);
     }, 500);
 }
 
 function openStore() {
-    try { if (window.mraid && typeof mraid.open === "function") { mraid.open(CTA_URL); return; } } catch (e) {}
-    window.open(CTA_URL, "_blank");
+    try { if (window.mraid && typeof mraid.open === "function") { mraid.open(SITE_URL); return; } } catch (e) {}
+    window.open(SITE_URL, "_blank", "noopener,noreferrer");
 }
 
 async function startGame() {
@@ -457,7 +471,7 @@ async function startGame() {
 /* ---------- INPUT ---------- */
 game.addEventListener("pointerdown", (e) => {
     Audio_.unlock(); Audio_.startMusic();
-    if (e.target === bulb || e.target === cta || e.target === soundButton || (e.target.closest && e.target.closest("#startButton"))) return;
+    if (e.target === bulb || e.target === finalText || e.target === soundButton || (e.target.closest && e.target.closest("#startButton"))) return;
     if (voiceLocked || interactionLocked || finalSceneShown) return;
     dragging = true; startX = lastX = e.clientX; startProgress = doorProgress;
     clearTimeout(idleTimer);
@@ -475,7 +489,6 @@ game.addEventListener("pointermove", (e) => {
     if (delta <= 0) return;
     const before = doorProgress;
     setDoorProgress(startProgress + (delta / game.clientWidth) * 100);
-    // частинки від реального руху дверей
     const moved = (doorProgress - before) / 100 * game.clientWidth;
     if (moved > 0) {
         moveSpeed += moved;
@@ -497,9 +510,13 @@ bulb.addEventListener("pointerdown", (e) => {
     showFinalScene();
 });
 
-cta.addEventListener("pointerdown", (e) => e.stopPropagation());
-cta.addEventListener("click", (e) => {
+finalText.addEventListener("pointerdown", (e) => { e.stopPropagation(); });
+finalText.addEventListener("click", (e) => {
+    if (!finalSceneShown || interactionLocked) return;
+    e.preventDefault();
     e.stopPropagation();
+    hand.style.opacity = "0";
+    hand.classList.remove("finalHint");
     triggerTapEffect(e.clientX, e.clientY);
     Audio_.tone({ frequency: 880, duration: .12, volume: .04, type: "triangle", slide: 120 });
     openStore();
