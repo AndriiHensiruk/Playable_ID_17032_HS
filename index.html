@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Sliding Door Playable</title>
+<title>Playable_ID_17032_HS</title>
 <link rel="preload" href="assets/bg.webp" as="image">
 <link rel="preload" href="assets/girl_1.webp" as="image">
 <link rel="preload" href="assets/door.webp" as="image">
@@ -125,7 +125,7 @@ const background = $("background"), tutorialText = $("tutorialText"), gameText =
 const bulb = $("bulb"), halo = $("bulbHalo"), finalText = $("finalText"), fade = $("fade");
 const whiteFlash = $("whiteFlash"), burstEl = $("burst"), soundButton = $("soundButton"), fx = $("fx"), fctx = fx.getContext("2d");
 
-const SITE_URL = "https://example.com";
+const SITE_URL = "https://honeytoon.com/comic/hot-serve/prologue";
 const SETTINGS = { releaseBack: 5, voiceDelay: 180, idleHintMs: 2500, thresholds: [20, 40, 80, 100] };
 const IMAGES = ["bg","girl_1","girl_2","girl_3","girl_4","girl_final","door","door_outline","bulb","hand","final_bg","tutorial_text","text_35","text_50","text_90","final_text"].map(n => `assets/${n}.webp `);
 const SOUNDS = { music: "assets/music.mp3", door: "assets/door_open.mp3", v35: "assets/text_35.mp3", v50: "assets/text_50.mp3", v90: "assets/text_90.mp3", vfinal: "assets/final_text.mp3" };
@@ -452,7 +452,7 @@ function showFinalScene() {
 
 function openStore() {
     try { if (window.mraid && typeof mraid.open === "function") { mraid.open(SITE_URL); return; } } catch (e) {}
-    window.open(SITE_URL, "_blank", "noopener,noreferrer");
+    window.open(SITE_URL, "_self", "noopener,noreferrer");
 }
 
 async function startGame() {
